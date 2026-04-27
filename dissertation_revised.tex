@@ -32,8 +32,7 @@
 \usepackage{fancyhdr}
 \usepackage{titlesec}
 \usepackage{appendix}
-\usepackage{natbib}
-\bibliographystyle{plainnat}
+\usepackage{cite}
 \graphicspath{{./}}
 
 % ── Page Style ──────────────────────────────────────────────────────────────
@@ -169,15 +168,15 @@ XGB & XGBoost (Extreme Gradient Boosting) \\
 \section{Background and Context}
 \label{sec:background}
 
-The proliferation of networked systems across critical infrastructure, cloud computing, and Internet of Things (IoT) environments has dramatically expanded the attack surface available to adversaries. According to recent industry reports, the global cost of cybercrime is projected to exceed \$10.5 trillion annually by 2025~\citep{barbero2022}, with network intrusions constituting one of the most prevalent and damaging attack vectors. Network Intrusion Detection Systems (NIDS) serve as a foundational defense layer, monitoring network traffic flows and classifying them as benign or malicious in real time.
+The proliferation of networked systems across critical infrastructure, cloud computing, and Internet of Things (IoT) environments has dramatically expanded the attack surface available to adversaries. According to recent industry reports, the global cost of cybercrime is projected to exceed \$10.5 trillion annually by 2025~\cite{barbero2022}, with network intrusions constituting one of the most prevalent and damaging attack vectors. Network Intrusion Detection Systems (NIDS) serve as a foundational defense layer, monitoring network traffic flows and classifying them as benign or malicious in real time.
 
-Historically, NIDS have followed two distinct paradigms. \emph{Signature-based} systems, exemplified by Snort~\citep{roesch1999} and Suricata, match observed traffic against a database of known attack patterns. While highly precise for known threats, these systems are fundamentally unable to detect novel attacks, which is a significant limitation given that adversaries continuously develop new techniques, tactics, and procedures (TTPs). \emph{Anomaly-based} systems, by contrast, learn a model of normal behavior and flag deviations. Machine learning approaches have dominated this paradigm for over a decade~\citep{buczak2016}, with Random Forests, Support Vector Machines, and deep neural networks achieving F1 scores exceeding 0.99 on standard benchmarks such as UNSW-NB15~\citep{moustafa2015} and CIC-IDS2017~\citep{sharafaldin2018}.
+Historically, NIDS have followed two distinct paradigms. \emph{Signature-based} systems, exemplified by Snort~\cite{roesch1999} and Suricata, match observed traffic against a database of known attack patterns. While highly precise for known threats, these systems are fundamentally unable to detect novel attacks, which is a significant limitation given that adversaries continuously develop new techniques, tactics, and procedures (TTPs). \emph{Anomaly-based} systems, by contrast, learn a model of normal behavior and flag deviations. Machine learning approaches have dominated this paradigm for over a decade~\cite{buczak2016}, with Random Forests, Support Vector Machines, and deep neural networks achieving F1 scores exceeding 0.99 on standard benchmarks such as UNSW-NB15~\cite{moustafa2015} and CIC-IDS2017~\cite{sharafaldin2018}.
 
-Despite these impressive benchmark results, the deployment of ML-based IDS in production environments remains limited by three interrelated challenges. The first is \emph{opacity}: black-box classifiers produce predictions without explanations, leaving security analysts unable to determine \emph{why} a flow was classified as an attack---which features contributed, which rules were triggered, or whether the decision is consistent with organizational security policy. This opacity undermines trust and impedes regulatory compliance, particularly in sectors governed by frameworks such as NIST SP 800-53 and the EU AI Act~\citep{buczak2016}.
+Despite these impressive benchmark results, the deployment of ML-based IDS in production environments remains limited by three interrelated challenges. The first is \emph{opacity}: black-box classifiers produce predictions without explanations, leaving security analysts unable to determine \emph{why} a flow was classified as an attack---which features contributed, which rules were triggered, or whether the decision is consistent with organizational security policy. This opacity undermines trust and impedes regulatory compliance, particularly in sectors governed by frameworks such as NIST SP 800-53 and the EU AI Act~\cite{buczak2016}.
 
-The second challenge is \emph{static decision boundaries}. Supervised classifiers are trained on a fixed dataset and deployed with frozen parameters. When adversaries introduce novel attack types---zero-day exploits, new malware families, or evolved command-and-control (C2) protocols---the classifier cannot adapt without costly offline retraining, data re-collection, and model re-validation~\citep{jordaney2017}. This rigidity creates a persistent window of vulnerability between the emergence of a new attack and the deployment of an updated model.
+The second challenge is \emph{static decision boundaries}. Supervised classifiers are trained on a fixed dataset and deployed with frozen parameters. When adversaries introduce novel attack types---zero-day exploits, new malware families, or evolved command-and-control (C2) protocols---the classifier cannot adapt without costly offline retraining, data re-collection, and model re-validation~\cite{jordaney2017}. This rigidity creates a persistent window of vulnerability between the emergence of a new attack and the deployment of an updated model.
 
-The third challenge is the \emph{absence of formal safety guarantees}. No mainstream ML-based IDS provides a mechanism to \emph{prove} that its decisions satisfy a set of safety constraints. A classifier might achieve 99\% accuracy overall yet systematically misclassify a specific attack variant that happens to fall near the decision boundary. Without formal verification, such failure modes are undetectable until exploitation occurs~\citep{alshiekh2018}.
+The third challenge is the \emph{absence of formal safety guarantees}. No mainstream ML-based IDS provides a mechanism to \emph{prove} that its decisions satisfy a set of safety constraints. A classifier might achieve 99\% accuracy overall yet systematically misclassify a specific attack variant that happens to fall near the decision boundary. Without formal verification, such failure modes are undetectable until exploitation occurs~\cite{alshiekh2018}.
 
 Addressing these three challenges requires drawing on several foundational techniques from machine learning, formal methods, and data mining, which are briefly introduced here and developed in detail in Chapters~\ref{ch:literature} and~\ref{ch:methodology}.
 
@@ -185,9 +184,9 @@ Addressing these three challenges requires drawing on several foundational techn
 
 \emph{Reinforcement learning} (RL) is a paradigm in which an agent learns to make sequential decisions by interacting with an environment and receiving reward signals. In the IDS context, the agent observes a network flow (the state), selects a classification action (ALLOW, BLOCK, or UNKNOWN), and receives a reward based on whether the classification was correct. Q-learning, a foundational RL algorithm, maintains a table of expected cumulative rewards for each state-action pair and updates these values as the agent gains experience. An epsilon-greedy exploration policy balances the agent's tendency to exploit known good actions with the need to explore potentially better alternatives.
 
-\emph{Satisfiability Modulo Theories} (SMT) solving is a formal verification technique that determines whether a set of logical constraints over mathematical theories (e.g., real arithmetic, bit-vectors) can be simultaneously satisfied. The Z3 solver, developed by Microsoft Research~\citep{demoura2008}, is a widely used SMT solver that can check whether a proposed classification action is consistent with a set of formally encoded rules. In the context of this dissertation, decision tree paths---sequences of feature-threshold comparisons leading from root to leaf---are extracted and encoded as first-order logic constraints in Z3, enabling formal verification of every classification decision before execution.
+\emph{Satisfiability Modulo Theories} (SMT) solving is a formal verification technique that determines whether a set of logical constraints over mathematical theories (e.g., real arithmetic, bit-vectors) can be simultaneously satisfied. The Z3 solver, developed by Microsoft Research~\cite{demoura2008}, is a widely used SMT solver that can check whether a proposed classification action is consistent with a set of formally encoded rules. In the context of this dissertation, decision tree paths---sequences of feature-threshold comparisons leading from root to leaf---are extracted and encoded as first-order logic constraints in Z3, enabling formal verification of every classification decision before execution.
 
-\emph{Density-Based Spatial Clustering of Applications with Noise} (DBSCAN) is an unsupervised clustering algorithm that groups data points based on density reachability~\citep{ester1996}. Unlike $k$-means, DBSCAN does not require specifying the number of clusters in advance and can discover clusters of arbitrary shape while identifying outliers as noise. In IDS applications, DBSCAN can be applied to collections of misclassified network flows to discover dense clusters that may represent previously unseen attack types.
+\emph{Density-Based Spatial Clustering of Applications with Noise} (DBSCAN) is an unsupervised clustering algorithm that groups data points based on density reachability~\cite{ester1996}. Unlike $k$-means, DBSCAN does not require specifying the number of clusters in advance and can discover clusters of arbitrary shape while identifying outliers as noise. In IDS applications, DBSCAN can be applied to collections of misclassified network flows to discover dense clusters that may represent previously unseen attack types.
 
 \emph{Adversarial perturbation} refers to the deliberate modification of input features to cause a classifier to produce incorrect predictions. In network security, adversaries may craft traffic flows with slightly altered characteristics to evade detection. \emph{Concept drift} occurs when the statistical properties of attack traffic change over time---for example, when adversaries modify their tactics, techniques, and procedures (TTPs)---causing classifiers trained on historical data to degrade in performance.
 
@@ -329,23 +328,23 @@ The following limitations bound the scope of this work:
 \label{sec:terminology}
 
 \begin{definition}[Network Flow]
-A network flow is a sequence of packets sharing a common 5-tuple: source IP, destination IP, source port, destination port, and transport protocol~\citep{lee1998}. Flows are characterized by aggregate statistics including duration, packet rate, byte rate, and inter-arrival time variability.
+A network flow is a sequence of packets sharing a common 5-tuple: source IP, destination IP, source port, destination port, and transport protocol~\cite{lee1998}. Flows are characterized by aggregate statistics including duration, packet rate, byte rate, and inter-arrival time variability.
 \end{definition}
 
 \begin{definition}[Symbolic Safety Shield]
-A formal verification mechanism that constrains the reinforcement learning agent's action space by encoding decision tree paths and DBSCAN-detected novel patterns as Z3 SMT constraints~\citep{demoura2008, alshiekh2018}. Before any classification action is executed, the shield verifies that the action satisfies all constraints; if verification fails, the shield overrides the agent's decision with a safe alternative.
+A formal verification mechanism that constrains the reinforcement learning agent's action space by encoding decision tree paths and DBSCAN-detected novel patterns as Z3 SMT constraints~\cite{demoura2008, alshiekh2018}. Before any classification action is executed, the shield verifies that the action satisfies all constraints; if verification fails, the shield overrides the agent's decision with a safe alternative.
 \end{definition}
 
 \begin{definition}[Composite Verifiability Score (CVS)]
-A scalar metric $\text{CVS} \in [0, 1]$ computed as the arithmetic mean of seven sub-metrics: formal rule extractability, constraint coverage, decision traceability, safety guarantee, deterministic reproducibility, audit trail completeness, and explanation complexity~\citep{young2025adaptive}. A CVS $\geq 0.70$ indicates deployment readiness for critical infrastructure.
+A scalar metric $\text{CVS} \in [0, 1]$ computed as the arithmetic mean of seven sub-metrics: formal rule extractability, constraint coverage, decision traceability, safety guarantee, deterministic reproducibility, audit trail completeness, and explanation complexity~\cite{young2025adaptive}. A CVS $\geq 0.70$ indicates deployment readiness for critical infrastructure.
 \end{definition}
 
 \begin{definition}[Novel Attack Pattern]
-A previously unseen cluster of misclassified network flows discovered by DBSCAN~\citep{ester1996} during online operation. Each novel pattern represents an attack variant not present in the training data. Upon discovery, the cluster center is converted to a Z3 \texttt{BLOCK} constraint, enabling immediate adaptation without retraining.
+A previously unseen cluster of misclassified network flows discovered by DBSCAN~\cite{ester1996} during online operation. Each novel pattern represents an attack variant not present in the training data. Upon discovery, the cluster center is converted to a Z3 \texttt{BLOCK} constraint, enabling immediate adaptation without retraining.
 \end{definition}
 
 \begin{definition}[Concept Drift]
-A change in the statistical properties of the target variable over time~\citep{jordaney2017}. In the IDS context, concept drift occurs when adversaries modify their TTPs, causing the distribution of attack features to shift relative to the training distribution.
+A change in the statistical properties of the target variable over time~\cite{jordaney2017}. In the IDS context, concept drift occurs when adversaries modify their TTPs, causing the distribution of attack features to shift relative to the training distribution.
 \end{definition}
 
 
@@ -380,39 +379,39 @@ This chapter provides a synthesis and critical evaluation of the literature acro
 
 \subsection{Classical Approaches}
 
-The application of machine learning to network intrusion detection dates to the late 1990s. Lee and Stolfo~\citep{lee1998} were among the first to apply data mining techniques to network audit logs, using association rules and frequent episodes to extract patterns from system call traces. Their work demonstrated that automated feature construction from raw audit data could achieve detection rates exceeding 80\% on the 1998 DARPA evaluation dataset, establishing the viability of ML-based intrusion detection. However, their approach required domain expertise to define the initial audit features and could not adapt to attack variants not represented in the training data.
+The application of machine learning to network intrusion detection dates to the late 1990s. Lee and Stolfo~\cite{lee1998} were among the first to apply data mining techniques to network audit logs, using association rules and frequent episodes to extract patterns from system call traces. Their work demonstrated that automated feature construction from raw audit data could achieve detection rates exceeding 80\% on the 1998 DARPA evaluation dataset, establishing the viability of ML-based intrusion detection. However, their approach required domain expertise to define the initial audit features and could not adapt to attack variants not represented in the training data.
 
-Similarly, the release of the KDD Cup 1999 dataset (KDD99) led to a number of studies applying supervised classifiers to network traffic. Amor et al.~\citep{amor2004naive} conducted a systematic comparison of Naive Bayes and decision tree classifiers on KDD99, finding that decision trees achieved 92.1\% accuracy compared to 90.4\% for Naive Bayes, with decision trees showing particular strength on rare attack types (U2R, R2L) due to their ability to learn complex feature interactions. Mukkamala et al.~\citep{mukkamala2002intrusion} compared neural networks and SVMs on the same dataset, reporting that SVMs achieved 99.5\% accuracy on DoS attacks but only 60.8\% on U2R attacks, highlighting the class-imbalance challenge that would persist throughout the IDS literature. Critically, Tavallaee et al.~\citep{tavallaee2009} later demonstrated that the KDD99 dataset contained approximately 78\% redundant records in the training set and 75\% in the test set, causing classifiers to achieve artificially inflated accuracy by memorizing duplicate patterns rather than learning generalizable decision boundaries. Their analysis led to the creation of the NSL-KDD dataset, which removed duplicates and rebalanced the class distribution.
+Similarly, the release of the KDD Cup 1999 dataset (KDD99) led to a number of studies applying supervised classifiers to network traffic. Amor et al.~\cite{amor2004naive} conducted a systematic comparison of Naive Bayes and decision tree classifiers on KDD99, finding that decision trees achieved 92.1\% accuracy compared to 90.4\% for Naive Bayes, with decision trees showing particular strength on rare attack types (U2R, R2L) due to their ability to learn complex feature interactions. Mukkamala et al.~\cite{mukkamala2002intrusion} compared neural networks and SVMs on the same dataset, reporting that SVMs achieved 99.5\% accuracy on DoS attacks but only 60.8\% on U2R attacks, highlighting the class-imbalance challenge that would persist throughout the IDS literature. Critically, Tavallaee et al.~\cite{tavallaee2009} later demonstrated that the KDD99 dataset contained approximately 78\% redundant records in the training set and 75\% in the test set, causing classifiers to achieve artificially inflated accuracy by memorizing duplicate patterns rather than learning generalizable decision boundaries. Their analysis led to the creation of the NSL-KDD dataset, which removed duplicates and rebalanced the class distribution.
 
-Building on this work, modern benchmark datasets have addressed these limitations through more rigorous data collection methodologies. The UNSW-NB15 dataset, created by Moustafa and Slay~\citep{moustafa2015} at the University of New South Wales, provides 2.54 million flows across 9 attack categories (Fuzzers, Analysis, Backdoors, DoS, Exploits, Generic, Reconnaissance, Shellcode, and Worms) generated in a controlled cyber range using the IXIA PerfectStorm tool. Unlike KDD99, UNSW-NB15 was designed to include realistic background traffic mixed with synthetic attacks, producing a more challenging evaluation environment where the best reported classifiers achieve F1 scores in the range of 0.85--0.95 rather than the near-perfect scores common on KDD99. The CSE-CIC-IDS-2018 dataset, developed by the Canadian Centre for Cybersecurity, simulates a realistic enterprise environment on AWS EC2 with 16.23 million flows and 7 attack types captured via CICFlowMeter v4. Its scale and diversity make it one of the most challenging publicly available IDS benchmarks. The CIC-IDS2017 dataset~\citep{sharafaldin2018} provides 3.12 million flows across 14 attack types from a controlled lab environment, with attacks executed over a five-day period to capture temporal progression from reconnaissance to exploitation.
+Building on this work, modern benchmark datasets have addressed these limitations through more rigorous data collection methodologies. The UNSW-NB15 dataset, created by Moustafa and Slay~\cite{moustafa2015} at the University of New South Wales, provides 2.54 million flows across 9 attack categories (Fuzzers, Analysis, Backdoors, DoS, Exploits, Generic, Reconnaissance, Shellcode, and Worms) generated in a controlled cyber range using the IXIA PerfectStorm tool. Unlike KDD99, UNSW-NB15 was designed to include realistic background traffic mixed with synthetic attacks, producing a more challenging evaluation environment where the best reported classifiers achieve F1 scores in the range of 0.85--0.95 rather than the near-perfect scores common on KDD99. The CSE-CIC-IDS-2018 dataset, developed by the Canadian Centre for Cybersecurity, simulates a realistic enterprise environment on AWS EC2 with 16.23 million flows and 7 attack types captured via CICFlowMeter v4. Its scale and diversity make it one of the most challenging publicly available IDS benchmarks. The CIC-IDS2017 dataset~\cite{sharafaldin2018} provides 3.12 million flows across 14 attack types from a controlled lab environment, with attacks executed over a five-day period to capture temporal progression from reconnaissance to exploitation.
 
 These studies raise critical questions about whether high accuracy on static benchmarks translates to reliable detection in operational environments. In particular, the class-imbalance challenge documented by Mukkamala et al. and the dataset bias exposed by Tavallaee et al. suggest that classical supervised classifiers alone are insufficient for robust intrusion detection. In sum, this research highlights the need for adaptive systems that can evolve beyond their training distributions while maintaining verifiable decision logic---precisely the capabilities that the \ASRRL{} framework is designed to provide through its integration of reinforcement learning, Z3 constraint verification, and DBSCAN-based novel attack detection.
 
 \subsection{Ensemble Methods}
 
-While classical approaches established the viability of machine learning for intrusion detection, their reliance on individual classifiers left significant room for improvement in both accuracy and robustness. Ensemble methods have generally achieved high classification accuracy on IDS benchmarks, leveraging the aggregation of multiple weak learners to reduce variance and improve generalization. Random Forests, in particular, have been extensively applied to IDS. Farnaaz and Jabbar~\citep{farnaaz2016} evaluated Random Forests on NSL-KDD with varying numbers of trees (10 to 500), finding that 100 trees achieved the best trade-off between accuracy (99.67\%) and computational cost, with diminishing returns beyond 200 trees. Their feature importance analysis revealed that \texttt{src\_bytes}, \texttt{dst\_bytes}, and \texttt{service} were the three most discriminative features, accounting for over 40\% of the cumulative importance. However, their evaluation was limited to a single dataset and did not assess the model's robustness to adversarial perturbation or concept drift.
+While classical approaches established the viability of machine learning for intrusion detection, their reliance on individual classifiers left significant room for improvement in both accuracy and robustness. Ensemble methods have generally achieved high classification accuracy on IDS benchmarks, leveraging the aggregation of multiple weak learners to reduce variance and improve generalization. Random Forests, in particular, have been extensively applied to IDS. Farnaaz and Jabbar~\cite{farnaaz2016} evaluated Random Forests on NSL-KDD with varying numbers of trees (10 to 500), finding that 100 trees achieved the best trade-off between accuracy (99.67\%) and computational cost, with diminishing returns beyond 200 trees. Their feature importance analysis revealed that \texttt{src\_bytes}, \texttt{dst\_bytes}, and \texttt{service} were the three most discriminative features, accounting for over 40\% of the cumulative importance. However, their evaluation was limited to a single dataset and did not assess the model's robustness to adversarial perturbation or concept drift.
 
-Zhang et al.~\citep{zhang2008random} conducted a more comprehensive Random Forest evaluation, training on KDD99 and testing on a temporally separated holdout to simulate deployment conditions. They reported a 12\% accuracy drop between the training and temporal-holdout evaluations, providing early evidence that static classifiers degrade under distribution shift. This finding motivates the adaptive components of the \ASRRL{} framework.
+Zhang et al.~\cite{zhang2008random} conducted a more comprehensive Random Forest evaluation, training on KDD99 and testing on a temporally separated holdout to simulate deployment conditions. They reported a 12\% accuracy drop between the training and temporal-holdout evaluations, providing early evidence that static classifiers degrade under distribution shift. This finding motivates the adaptive components of the \ASRRL{} framework.
 
-By contrast with Random Forests, gradient boosting methods have also shown strong performance by optimizing sequentially rather than in parallel. Dhaliwal et al.~\citep{dhaliwal2018} achieved F1 scores of 0.98+ on UNSW-NB15 by combining recursive feature elimination with XGBoost, reducing the feature set from 49 to 12 features while maintaining accuracy. Their analysis demonstrated that careful feature selection could eliminate redundant and noisy features that degraded ensemble performance, a finding that informs \ASRRL{}'s use of a compact 10-feature schema. However, their XGBoost model produced no interpretable decision logic. The 500-tree ensemble's combined decision process is opaque, making it difficult for a security analyst to understand why a particular flow was classified as malicious.
+By contrast with Random Forests, gradient boosting methods have also shown strong performance by optimizing sequentially rather than in parallel. Dhaliwal et al.~\cite{dhaliwal2018} achieved F1 scores of 0.98+ on UNSW-NB15 by combining recursive feature elimination with XGBoost, reducing the feature set from 49 to 12 features while maintaining accuracy. Their analysis demonstrated that careful feature selection could eliminate redundant and noisy features that degraded ensemble performance, a finding that informs \ASRRL{}'s use of a compact 10-feature schema. However, their XGBoost model produced no interpretable decision logic. The 500-tree ensemble's combined decision process is opaque, making it difficult for a security analyst to understand why a particular flow was classified as malicious.
 
-LightGBM, introduced by Ke et al.~\citep{ke2017}, offers faster training through histogram-based splitting and leaf-wise tree growth. In the IDS context, LightGBM has been shown to achieve accuracy comparable to XGBoost while reducing training time by 2--5$\times$ on large datasets. Despite this efficiency advantage, LightGBM shares the same interpretability limitation as all ensemble methods: the aggregation of hundreds of weak learners into a single prediction obscures the decision process, preventing formal verification.
+LightGBM, introduced by Ke et al.~\cite{ke2017}, offers faster training through histogram-based splitting and leaf-wise tree growth. In the IDS context, LightGBM has been shown to achieve accuracy comparable to XGBoost while reducing training time by 2--5$\times$ on large datasets. Despite this efficiency advantage, LightGBM shares the same interpretability limitation as all ensemble methods: the aggregation of hundreds of weak learners into a single prediction obscures the decision process, preventing formal verification.
 
 While these findings highlight the accuracy gains achievable through ensemble aggregation, it is also important to consider the interpretability cost that accompanies these improvements. The opacity of ensemble predictions---whether from Random Forests, XGBoost, or LightGBM---prevents formal verification of individual decisions and precludes the kind of auditable reasoning required in security-critical deployments. The \ASRRL{} framework addresses this tension by using a single decision tree as its classification backbone, sacrificing the marginal accuracy gain of ensembles in exchange for full constraint extractability, which in turn enables Z3-backed formal verification of every classification decision.
 
 \subsection{Deep Learning Approaches}
 
-Deep neural networks have been applied extensively to IDS, with each architecture family offering different strengths. Shone et al.~\citep{shone2018} proposed a non-symmetric deep autoencoder (NDAE) for unsupervised feature learning, followed by a Random Forest classifier. Their two-stage approach achieved 97.85\% accuracy on KDD99 and 85.42\% on NSL-KDD, demonstrating that autoencoder-learned representations could capture more discriminative features than hand-engineered alternatives. However, the autoencoder's latent space was not interpretable, and the overall system provided no mechanism for explaining individual predictions.
+Deep neural networks have been applied extensively to IDS, with each architecture family offering different strengths. Shone et al.~\cite{shone2018} proposed a non-symmetric deep autoencoder (NDAE) for unsupervised feature learning, followed by a Random Forest classifier. Their two-stage approach achieved 97.85\% accuracy on KDD99 and 85.42\% on NSL-KDD, demonstrating that autoencoder-learned representations could capture more discriminative features than hand-engineered alternatives. However, the autoencoder's latent space was not interpretable, and the overall system provided no mechanism for explaining individual predictions.
 
-Building on this work, Wang et al.~\citep{wang2017} introduced a novel CNN-based approach that converts raw network traffic into grayscale images and applies image classification techniques. Their method achieved 99.2\% accuracy on ISCX-2012 by treating each flow's byte sequence as a visual pattern, enabling the CNN to learn spatial correlations within packet payloads. While creative, this approach requires access to raw packet payloads (not just flow-level statistics), limiting its applicability in encrypted-traffic environments where payload inspection is infeasible.
+Building on this work, Wang et al.~\cite{wang2017} introduced a novel CNN-based approach that converts raw network traffic into grayscale images and applies image classification techniques. Their method achieved 99.2\% accuracy on ISCX-2012 by treating each flow's byte sequence as a visual pattern, enabling the CNN to learn spatial correlations within packet payloads. While creative, this approach requires access to raw packet payloads (not just flow-level statistics), limiting its applicability in encrypted-traffic environments where payload inspection is infeasible.
 
-Similarly, Kim and Ho~\citep{kim2016} applied LSTM networks to model the temporal dependencies between consecutive network flows, achieving 96.9\% accuracy on KDD99. Their key insight was that attacks often manifest as sequences of related flows (e.g., a port scan followed by an exploit attempt), and temporal models can capture these multi-step patterns. However, their LSTM model contained over 2 million parameters, making it computationally expensive and entirely opaque to human inspection.
+Similarly, Kim and Ho~\cite{kim2016} applied LSTM networks to model the temporal dependencies between consecutive network flows, achieving 96.9\% accuracy on KDD99. Their key insight was that attacks often manifest as sequences of related flows (e.g., a port scan followed by an exploit attempt), and temporal models can capture these multi-step patterns. However, their LSTM model contained over 2 million parameters, making it computationally expensive and entirely opaque to human inspection.
 
 In sum, this research highlights the fundamental trade-off between representational power and interpretability in deep learning for IDS. While autoencoders, CNNs, and LSTMs each achieve competitive accuracy through distinct inductive biases, none provides a mechanism for formal verification or human-understandable explanations of individual decisions. These studies inform the \ASRRL{} framework's design choice to avoid deep neural network classifiers entirely, instead relying on a shallow decision tree whose structure can be directly converted into Z3 constraints, thereby achieving formal verifiability without sacrificing the adaptability that RL provides.
 
 \subsection{Critical Assessment}
 
-The literature on ML-based IDS is characterized by three recurring weaknesses that collectively motivate the \ASRRL{} framework. First, most studies evaluate on a single dataset, limiting generalizability claims. Buczak and Guven~\citep{buczak2016} surveyed 71 ML-based IDS papers and found that 68\% evaluated on only one dataset, with KDD99/NSL-KDD accounting for over 60\% of all evaluations. This monoculture creates a risk of overfitting evaluation methodologies to a single data distribution. Second, evaluation is typically limited to accuracy metrics (precision, recall, F1) without assessing robustness to adversarial perturbation, adaptability to concept drift, or formal verifiability of individual decisions. Ahmad et al.~\citep{ahmad2021} noted that fewer than 5\% of surveyed IDS papers included any form of adversarial evaluation. Third, no prior work in the ML-based IDS literature provides formal verification of individual classification decisions; the closest approximation is post-hoc explanation via LIME or SHAP, which provides local approximations rather than provable guarantees.
+The literature on ML-based IDS is characterized by three recurring weaknesses that collectively motivate the \ASRRL{} framework. First, most studies evaluate on a single dataset, limiting generalizability claims. Buczak and Guven~\cite{buczak2016} surveyed 71 ML-based IDS papers and found that 68\% evaluated on only one dataset, with KDD99/NSL-KDD accounting for over 60\% of all evaluations. This monoculture creates a risk of overfitting evaluation methodologies to a single data distribution. Second, evaluation is typically limited to accuracy metrics (precision, recall, F1) without assessing robustness to adversarial perturbation, adaptability to concept drift, or formal verifiability of individual decisions. Ahmad et al.~\cite{ahmad2021} noted that fewer than 5\% of surveyed IDS papers included any form of adversarial evaluation. Third, no prior work in the ML-based IDS literature provides formal verification of individual classification decisions; the closest approximation is post-hoc explanation via LIME or SHAP, which provides local approximations rather than provable guarantees.
 
 These studies raise critical questions about what an IDS framework must provide beyond raw classification accuracy: namely, multi-dataset generalizability, adversarial robustness, and provable decision traceability. The \ASRRL{} framework directly addresses each of these three weaknesses by evaluating on three benchmark datasets, incorporating Z3 constraint verification that is immune to adversarial explanation attacks, and providing a Composite Verifiability Score that quantifies the formal auditability of every classification decision.
 
@@ -424,29 +423,29 @@ These studies raise critical questions about what an IDS framework must provide 
 
 The application of reinforcement learning to intrusion detection is a growing but still nascent research area. Servin and Kudenko (2008) proposed one of the earliest RL-based IDS, modeling the detection task as a Partially Observable MDP where the agent observes noisy features of network traffic and must learn a detection policy through interaction with the environment. Their approach used tabular Q-learning with a manually discretized state space and demonstrated that RL could learn effective detection policies on a simplified two-class traffic model. However, the state discretization was ad hoc, the action space was limited to binary detect/ignore decisions, and no formal safety guarantees prevented the agent from allowing malicious traffic during the exploration phase of training.
 
-Building on this early work, Lopez-Martin et al.~\citep{lopez2020} applied Deep Q-Networks (DQN) to network traffic classification on UNSW-NB15, achieving 89.5\% accuracy with a three-layer neural network policy. Their work demonstrated that deep RL could scale to realistic feature spaces without manual discretization, but the neural network policy was entirely opaque, as an analyst could not determine why the agent blocked a particular flow. Additionally, the training process required approximately 50,000 episodes to converge, during which the agent made thousands of incorrect classifications with no safety mechanism to prevent dangerous false negatives.
+Building on this early work, Lopez-Martin et al.~\cite{lopez2020} applied Deep Q-Networks (DQN) to network traffic classification on UNSW-NB15, achieving 89.5\% accuracy with a three-layer neural network policy. Their work demonstrated that deep RL could scale to realistic feature spaces without manual discretization, but the neural network policy was entirely opaque, as an analyst could not determine why the agent blocked a particular flow. Additionally, the training process required approximately 50,000 episodes to converge, during which the agent made thousands of incorrect classifications with no safety mechanism to prevent dangerous false negatives.
 
-By contrast with these offline approaches, Sethi and Kantardzic~\citep{sethi2018} proposed an online RL framework specifically designed to handle concept drift in data streams. Their approach maintained a sliding window of recent traffic and periodically retrained the RL policy using a reward signal derived from delayed ground-truth labels. They demonstrated that their RL agent maintained 85\% accuracy over a 6-month simulated deployment with three induced concept drift events, compared to a static Random Forest that degraded to 72\% accuracy. However, their approach lacked formal safety constraints, meaning the agent could freely explore the action space during deployment, potentially allowing misclassifications. Their approach also provided no interpretable explanation for its decisions.
+By contrast with these offline approaches, Sethi and Kantardzic~\cite{sethi2018} proposed an online RL framework specifically designed to handle concept drift in data streams. Their approach maintained a sliding window of recent traffic and periodically retrained the RL policy using a reward signal derived from delayed ground-truth labels. They demonstrated that their RL agent maintained 85\% accuracy over a 6-month simulated deployment with three induced concept drift events, compared to a static Random Forest that degraded to 72\% accuracy. However, their approach lacked formal safety constraints, meaning the agent could freely explore the action space during deployment, potentially allowing misclassifications. Their approach also provided no interpretable explanation for its decisions.
 
-Caminero et al.~\citep{caminero2019} explored multi-objective RL for IDS, training agents to simultaneously minimize false positives and false negatives through a Pareto-optimal reward structure. Their approach generated a set of non-dominated policies that an analyst could choose from based on deployment context. While this work provided useful flexibility, it did not address the fundamental limitations of RL-based IDS: unsafe exploration, lack of formal guarantees, and opaque decision-making.
+Caminero et al.~\cite{caminero2019} explored multi-objective RL for IDS, training agents to simultaneously minimize false positives and false negatives through a Pareto-optimal reward structure. Their approach generated a set of non-dominated policies that an analyst could choose from based on deployment context. While this work provided useful flexibility, it did not address the fundamental limitations of RL-based IDS: unsafe exploration, lack of formal guarantees, and opaque decision-making.
 
 In sum, this research highlights that RL offers a promising paradigm for adaptive intrusion detection but that existing RL-based IDS approaches consistently fail to address three interrelated challenges: unsafe exploration during training, absence of formal safety guarantees, and opaque decision processes. The \ASRRL{} framework addresses all three simultaneously by constraining the RL agent's action space through Z3-verified symbolic shields derived from decision tree structure, ensuring that every action taken during both training and deployment satisfies formally verified safety properties while remaining fully interpretable.
 
 \subsection{Safe and Shielded Reinforcement Learning}
 
-The concept of \emph{shielded reinforcement learning} was formalized by Alshiekh et al.~\citep{alshiekh2018}, who proposed using a reactive synthesis shield to constrain an RL agent's actions based on temporal logic specifications. Their shield is constructed from a safety specification expressed in Linear Temporal Logic (LTL), and it preemptively filters unsafe actions before they are executed. They demonstrated their approach on a grid-world navigation task and a self-driving car simulator, showing that the shielded agent achieved comparable reward to an unshielded agent while satisfying safety properties with probability 1.0. However, their shield construction requires a complete model of the environment dynamics, which is unavailable in the network security domain where attack distributions are unknown and non-stationary.
+The concept of \emph{shielded reinforcement learning} was formalized by Alshiekh et al.~\cite{alshiekh2018}, who proposed using a reactive synthesis shield to constrain an RL agent's actions based on temporal logic specifications. Their shield is constructed from a safety specification expressed in Linear Temporal Logic (LTL), and it preemptively filters unsafe actions before they are executed. They demonstrated their approach on a grid-world navigation task and a self-driving car simulator, showing that the shielded agent achieved comparable reward to an unshielded agent while satisfying safety properties with probability 1.0. However, their shield construction requires a complete model of the environment dynamics, which is unavailable in the network security domain where attack distributions are unknown and non-stationary.
 
-Jansen et al.~\citep{jansen2020} extended the shielding concept to probabilistic shields using model checking. Their approach constructs a Markov Decision Process model of the environment and uses probabilistic model checking (via the PRISM tool) to compute the set of actions that satisfy probabilistic safety constraints (e.g., ``the probability of a false negative is at most 0.05''). While this approach is theoretically sound, it is computationally intractable for environments with large state spaces because the model checking step has time complexity exponential in the number of state variables, making it impractical for network traffic classification with continuous-valued features.
+Jansen et al.~\cite{jansen2020} extended the shielding concept to probabilistic shields using model checking. Their approach constructs a Markov Decision Process model of the environment and uses probabilistic model checking (via the PRISM tool) to compute the set of actions that satisfy probabilistic safety constraints (e.g., ``the probability of a false negative is at most 0.05''). While this approach is theoretically sound, it is computationally intractable for environments with large state spaces because the model checking step has time complexity exponential in the number of state variables, making it impractical for network traffic classification with continuous-valued features.
 
-Hasanbeig et al.~\citep{hasanbeig2020} combined LTL specifications with deep RL for safe exploration, using an automaton-based reward shaping mechanism that penalizes trajectories violating the LTL specification. Their approach achieved near-zero safety violations on a multi-agent collision-avoidance task. However, translating network security requirements into LTL formulas requires significant domain expertise, and the approach provides no mechanism for the safety specification to evolve as new attacks emerge.
+Hasanbeig et al.~\cite{hasanbeig2020} combined LTL specifications with deep RL for safe exploration, using an automaton-based reward shaping mechanism that penalizes trajectories violating the LTL specification. Their approach achieved near-zero safety violations on a multi-agent collision-avoidance task. However, translating network security requirements into LTL formulas requires significant domain expertise, and the approach provides no mechanism for the safety specification to evolve as new attacks emerge.
 
 These works establish the theoretical foundation for constrained RL but have not been applied to intrusion detection. The \ASRRL{} framework adapts the shielding concept by using SMT constraints derived from decision tree structure, creating a domain-specific safety mechanism that is both semantically meaningful (tree paths correspond to interpretable feature conditions) and computationally efficient (Z3 verification is bounded by tree depth). Crucially, \ASRRL{}'s constraints can evolve through DBSCAN-based novel attack detection, addressing the static-specification limitation of prior shielded RL approaches.
 
 \subsection{Multi-Agent and Hierarchical RL for Security}
 
-Nguyen and Reddi~\citep{nguyen2021} surveyed the application of deep RL to cybersecurity, cataloging 127 papers across five domains: network security, malware analysis, cryptography, privacy, and autonomous cyber defense. Their survey identified a critical gap: while RL had been successfully applied to automated penetration testing (where unsafe exploration is desirable) and network defense games (where the environment is fully simulated), its application to production IDS remained limited due to the unresolved challenges of unsafe exploration and lack of formal guarantees.
+Nguyen and Reddi~\cite{nguyen2021} surveyed the application of deep RL to cybersecurity, cataloging 127 papers across five domains: network security, malware analysis, cryptography, privacy, and autonomous cyber defense. Their survey identified a critical gap: while RL had been successfully applied to automated penetration testing (where unsafe exploration is desirable) and network defense games (where the environment is fully simulated), its application to production IDS remained limited due to the unresolved challenges of unsafe exploration and lack of formal guarantees.
 
-Wu et al.~\citep{wu2022} proposed a hierarchical RL approach for multi-stage attack detection, where a high-level policy selects among specialized sub-policies trained on individual attack types (DoS, probe, R2L, U2R). Their approach achieved 95.7\% accuracy on NSL-KDD by decomposing the detection task, but the hierarchical policy structure increased model complexity without improving interpretability. While these approaches demonstrate the versatility of RL in security, they do not address formal verification or online novel attack detection, which are the two capabilities that most distinguish \ASRRL{} from prior RL-based IDS work. These studies raise critical questions about whether increasing the structural complexity of RL architectures (e.g., multi-agent coordination, hierarchical decomposition) yields meaningful gains without first resolving the foundational issues of safety and verifiability. The \ASRRL{} framework takes a complementary approach: rather than adding architectural complexity, it augments a single Q-learning agent with a Z3-backed symbolic safety shield and DBSCAN-based novel attack detection, prioritizing verifiable, interpretable decisions over elaborate multi-agent coordination.
+Wu et al.~\cite{wu2022} proposed a hierarchical RL approach for multi-stage attack detection, where a high-level policy selects among specialized sub-policies trained on individual attack types (DoS, probe, R2L, U2R). Their approach achieved 95.7\% accuracy on NSL-KDD by decomposing the detection task, but the hierarchical policy structure increased model complexity without improving interpretability. While these approaches demonstrate the versatility of RL in security, they do not address formal verification or online novel attack detection, which are the two capabilities that most distinguish \ASRRL{} from prior RL-based IDS work. These studies raise critical questions about whether increasing the structural complexity of RL architectures (e.g., multi-agent coordination, hierarchical decomposition) yields meaningful gains without first resolving the foundational issues of safety and verifiability. The \ASRRL{} framework takes a complementary approach: rather than adding architectural complexity, it augments a single Q-learning agent with a Z3-backed symbolic safety shield and DBSCAN-based novel attack detection, prioritizing verifiable, interpretable decisions over elaborate multi-agent coordination.
 
 
 \section{Symbolic Reasoning and Formal Verification}
@@ -454,23 +453,23 @@ Wu et al.~\citep{wu2022} proposed a hierarchical RL approach for multi-stage att
 
 \subsection{SMT Solvers in Security}
 
-Satisfiability Modulo Theories (SMT) solvers have become fundamental tools in program verification, software testing, and security analysis. The Z3 solver, developed by de Moura and Bj{\o}rner~\citep{demoura2008} at Microsoft Research, supports a wide range of first-order theories including linear and nonlinear arithmetic, arrays, bit-vectors, and uninterpreted functions. Z3's architecture combines a DPLL(T) SAT solver core with theory-specific decision procedures, enabling it to reason about complex formulas involving mixed theories. In performance benchmarks, Z3 consistently ranks among the top SMT solvers, solving over 95\% of the SMT-COMP benchmark instances within a 60-second timeout.
+Satisfiability Modulo Theories (SMT) solvers have become fundamental tools in program verification, software testing, and security analysis. The Z3 solver, developed by de Moura and Bj{\o}rner~\cite{demoura2008} at Microsoft Research, supports a wide range of first-order theories including linear and nonlinear arithmetic, arrays, bit-vectors, and uninterpreted functions. Z3's architecture combines a DPLL(T) SAT solver core with theory-specific decision procedures, enabling it to reason about complex formulas involving mixed theories. In performance benchmarks, Z3 consistently ranks among the top SMT solvers, solving over 95\% of the SMT-COMP benchmark instances within a 60-second timeout.
 
-In the security domain, Z3 has been applied to several verification problems. Bhargavan et al.~\citep{bhargavan2017} used Z3 to verify the cryptographic protocol implementations of TLS~1.3, proving that the reference implementation satisfies authentication and secrecy properties under a Dolev-Yao adversary model. Their verification covered 15,000 lines of F* code and identified two previously unknown edge cases in the handshake protocol. This work demonstrates Z3's capacity to reason about complex security properties at scale.
+In the security domain, Z3 has been applied to several verification problems. Bhargavan et al.~\cite{bhargavan2017} used Z3 to verify the cryptographic protocol implementations of TLS~1.3, proving that the reference implementation satisfies authentication and secrecy properties under a Dolev-Yao adversary model. Their verification covered 15,000 lines of F* code and identified two previously unknown edge cases in the handshake protocol. This work demonstrates Z3's capacity to reason about complex security properties at scale.
 
 While these findings highlight Z3's effectiveness in protocol verification and program analysis, it is also important to consider how SMT solving can be applied to the distinct problem of runtime classification verification. The \ASRRL{} framework extends the application of Z3 from static verification (proving properties of fixed code or protocols) to dynamic verification of individual classification decisions, where each network flow is checked against an evolving set of constraints extracted from decision tree paths. This novel application leverages the same logical reasoning capabilities demonstrated by Bhargavan et al. but applies them at the granularity of individual data points rather than entire programs.
 
 \subsection{Symbolic Execution for Vulnerability Discovery}
 
-Symbolic execution represents programs as mathematical expressions over symbolic inputs, using SMT solvers to determine which inputs reach specific program states. The angr framework~\citep{shoshitaishvili2016} provides a Python-based platform for binary analysis that uses Z3 as its constraint backend. angr has been used to discover vulnerabilities in COTS software, automatically generating inputs that trigger buffer overflows, format string vulnerabilities, and integer overflows. Avgerinos et al.~\citep{avgerinos2014} extended this approach to automatic exploit generation (AEG), demonstrating that Z3-backed symbolic execution could not only find vulnerabilities but automatically construct working exploits for 16 real-world programs.
+Symbolic execution represents programs as mathematical expressions over symbolic inputs, using SMT solvers to determine which inputs reach specific program states. The angr framework~\cite{shoshitaishvili2016} provides a Python-based platform for binary analysis that uses Z3 as its constraint backend. angr has been used to discover vulnerabilities in COTS software, automatically generating inputs that trigger buffer overflows, format string vulnerabilities, and integer overflows. Avgerinos et al.~\cite{avgerinos2014} extended this approach to automatic exploit generation (AEG), demonstrating that Z3-backed symbolic execution could not only find vulnerabilities but automatically construct working exploits for 16 real-world programs.
 
-KLEE~\citep{cadar2008} similarly employs constraint solving for automated test generation, achieving over 90\% code coverage on GNU Coreutils (89 programs, approximately 80,000 lines of C code) by systematically exploring feasible program paths. These tools demonstrate that SMT-based reasoning can scale to programs with millions of possible execution paths, providing confidence that Z3 can handle the comparatively simpler constraint sets generated by decision tree extraction in \ASRRL{}.
+KLEE~\cite{cadar2008} similarly employs constraint solving for automated test generation, achieving over 90\% code coverage on GNU Coreutils (89 programs, approximately 80,000 lines of C code) by systematically exploring feasible program paths. These tools demonstrate that SMT-based reasoning can scale to programs with millions of possible execution paths, providing confidence that Z3 can handle the comparatively simpler constraint sets generated by decision tree extraction in \ASRRL{}.
 
 These studies raise critical questions about the boundary between static analysis and runtime verification: while symbolic execution excels at pre-deployment vulnerability discovery, it has not been applied to the online verification of classification decisions during system operation. The \ASRRL{} framework adapts the core insight of symbolic execution---that program paths can be expressed as satisfiability constraints---to the IDS domain, where decision tree paths serve an analogous role to program execution paths. This adaptation enables runtime constraint checking that is computationally bounded by tree depth rather than program complexity, making per-flow verification feasible at network speeds.
 
 \subsection{Neuro-Symbolic AI}
 
-The integration of neural networks with symbolic reasoning, often termed \emph{neuro-symbolic AI}, has received growing attention as a means of combining the pattern-recognition capabilities of deep learning with the reasoning and interpretability properties of symbolic systems. Garcez et al.~\citep{garcez2019} surveyed neural-symbolic integration and identified three waves of development: early logic programming approaches (1990s), kernel-based integration (2000s), and the current wave of differentiable reasoning systems. They argued that the third wave's key challenge is maintaining the formal guarantees of symbolic reasoning while benefiting from the scalability of neural learning.
+The integration of neural networks with symbolic reasoning, often termed \emph{neuro-symbolic AI}, has received growing attention as a means of combining the pattern-recognition capabilities of deep learning with the reasoning and interpretability properties of symbolic systems. Garcez et al.~\cite{garcez2019} surveyed neural-symbolic integration and identified three waves of development: early logic programming approaches (1990s), kernel-based integration (2000s), and the current wave of differentiable reasoning systems. They argued that the third wave's key challenge is maintaining the formal guarantees of symbolic reasoning while benefiting from the scalability of neural learning.
 
 Mao et al. (2019) proposed the Neuro-Symbolic Concept Learner (NS-CL), which combines a neural perception module (for visual scene understanding) with a symbolic program executor (for answering questions about the scene). NS-CL achieved 98.9\% accuracy on the CLEVR visual question answering benchmark by learning to decompose questions into symbolic programs grounded in neural scene representations. While NS-CL addresses a different domain (visual reasoning), its architecture, in which neural perception feeds into symbolic reasoning, is conceptually similar to \ASRRL{}'s approach of using a decision tree (perception) to feed Z3 constraints (reasoning).
 
@@ -482,21 +481,21 @@ The \ASRRL{} framework contributes to this neuro-symbolic paradigm by demonstrat
 
 \subsection{Concept Drift in IDS}
 
-Concept drift, the phenomenon whereby the statistical relationship between input features and output labels changes over time, is a well-documented challenge in network security. Jordaney et al.~\citep{jordaney2017} conducted a study of classifier degradation in malware detection, training a Random Forest on Android malware samples from 2012 and tracking its performance monthly through 2016. They observed that F1 score degraded from 0.95 to below 0.70 within 12 months, with the degradation accelerating during periods of rapid malware evolution. Their analysis attributed the drift to two factors: feature distribution shift (malware authors adopting new obfuscation techniques that changed the statistical properties of code features) and label drift (previously benign APIs becoming associated with malicious behavior as new attack techniques emerged).
+Concept drift, the phenomenon whereby the statistical relationship between input features and output labels changes over time, is a well-documented challenge in network security. Jordaney et al.~\cite{jordaney2017} conducted a study of classifier degradation in malware detection, training a Random Forest on Android malware samples from 2012 and tracking its performance monthly through 2016. They observed that F1 score degraded from 0.95 to below 0.70 within 12 months, with the degradation accelerating during periods of rapid malware evolution. Their analysis attributed the drift to two factors: feature distribution shift (malware authors adopting new obfuscation techniques that changed the statistical properties of code features) and label drift (previously benign APIs becoming associated with malicious behavior as new attack techniques emerged).
 
-Building on this work, Barbero et al.~\citep{barbero2022} revisited the concept drift problem and proposed Transcend, a framework for detecting and adapting to drift in malware classifiers. Transcend maintains an ensemble of classifiers trained on different temporal windows and uses a conformal prediction-based mechanism to detect when the current ensemble's predictions become unreliable. Their approach achieved stable F1 scores ($> 0.85$) over a 4-year evaluation period on the EMBER malware dataset, compared to a static classifier that degraded to 0.65. However, Transcend requires labeled data from recent time periods to retrain ensemble members, making it unsuitable for zero-day attacks where labels are unavailable.
+Building on this work, Barbero et al.~\cite{barbero2022} revisited the concept drift problem and proposed Transcend, a framework for detecting and adapting to drift in malware classifiers. Transcend maintains an ensemble of classifiers trained on different temporal windows and uses a conformal prediction-based mechanism to detect when the current ensemble's predictions become unreliable. Their approach achieved stable F1 scores ($> 0.85$) over a 4-year evaluation period on the EMBER malware dataset, compared to a static classifier that degraded to 0.65. However, Transcend requires labeled data from recent time periods to retrain ensemble members, making it unsuitable for zero-day attacks where labels are unavailable.
 
-Similarly, Tang et al.~\citep{tang2020} proposed a drift-adaptive ensemble specifically for network IDS, combining ADWIN (Adaptive Windowing) for drift detection with online gradient boosting for model updates. Their approach achieved 94.2\% accuracy on a 6-month UNSW-NB15 evaluation with simulated concept drift, maintaining performance within 3\% of a fully retrained model. The key limitation of their approach is computational cost: online gradient boosting requires retraining the entire ensemble on each detected drift event, which takes 15 to 30 minutes on a typical workstation, a latency that may be unacceptable for real-time IDS deployment.
+Similarly, Tang et al.~\cite{tang2020} proposed a drift-adaptive ensemble specifically for network IDS, combining ADWIN (Adaptive Windowing) for drift detection with online gradient boosting for model updates. Their approach achieved 94.2\% accuracy on a 6-month UNSW-NB15 evaluation with simulated concept drift, maintaining performance within 3\% of a fully retrained model. The key limitation of their approach is computational cost: online gradient boosting requires retraining the entire ensemble on each detected drift event, which takes 15 to 30 minutes on a typical workstation, a latency that may be unacceptable for real-time IDS deployment.
 
 In sum, this research highlights that concept drift is an unavoidable challenge in deployed IDS and that existing adaptation mechanisms either require labeled data from recent time periods or impose prohibitive computational costs. The \ASRRL{} framework addresses concept drift through a complementary mechanism: its DBSCAN-based novel attack detection identifies emerging patterns in misclassified flows without requiring ground-truth labels, and the resulting Z3 constraints are injected into the symbolic safety shield in real time, enabling adaptation without full model retraining. While these findings highlight the severity of classifier degradation under distribution shift, the \ASRRL{} approach demonstrates that lightweight, constraint-based adaptation can maintain detection quality at a fraction of the computational cost of ensemble retraining.
 
 \subsection{Clustering for Anomaly Detection}
 
-Unsupervised clustering has been applied to detect previously unseen attack types without requiring labeled examples of novel attacks. The DBSCAN algorithm, introduced by Ester et al.~\citep{ester1996}, identifies clusters as dense regions of points separated by regions of low density. DBSCAN's three key properties make it well-suited to network traffic analysis: (1)~it does not require the number of clusters to be specified a priori, which is essential when the number of attack types is unknown; (2)~it can identify clusters of arbitrary shape, accommodating the non-spherical distributions common in network feature spaces; and (3)~it labels low-density points as noise (label $-1$), naturally separating systematic attack patterns from isolated anomalies.
+Unsupervised clustering has been applied to detect previously unseen attack types without requiring labeled examples of novel attacks. The DBSCAN algorithm, introduced by Ester et al.~\cite{ester1996}, identifies clusters as dense regions of points separated by regions of low density. DBSCAN's three key properties make it well-suited to network traffic analysis: (1)~it does not require the number of clusters to be specified a priori, which is essential when the number of attack types is unknown; (2)~it can identify clusters of arbitrary shape, accommodating the non-spherical distributions common in network feature spaces; and (3)~it labels low-density points as noise (label $-1$), naturally separating systematic attack patterns from isolated anomalies.
 
 Leung and Leckie (2005) applied DBSCAN to network traffic from an Australian university network, demonstrating that DBSCAN could separate attack clusters (port scans, SSH brute force, web exploits) from benign traffic with 87\% precision and 82\% recall using only 5 flow-level features. Their analysis revealed that the choice of the $\epsilon$ parameter was critical: values that were too small produced many fragmented clusters (each attack session in its own cluster), while values that were too large merged distinct attack types into a single cluster. They recommended using the $k$-distance plot method to select $\epsilon$ empirically for each network environment.
 
-Pang et al.~\citep{pang2021} surveyed deep learning approaches for anomaly detection, including autoencoder-based methods, GAN-based methods, and self-supervised approaches. They noted that while deep anomaly detection methods achieve state-of-the-art performance on image and video datasets, their application to network traffic remains challenging due to the tabular (rather than spatial) structure of flow-level features and the extreme class imbalance common in network datasets (attack traffic typically constitutes 1--5\% of total traffic in production environments).
+Pang et al.~\cite{pang2021} surveyed deep learning approaches for anomaly detection, including autoencoder-based methods, GAN-based methods, and self-supervised approaches. They noted that while deep anomaly detection methods achieve state-of-the-art performance on image and video datasets, their application to network traffic remains challenging due to the tabular (rather than spatial) structure of flow-level features and the extreme class imbalance common in network datasets (attack traffic typically constitutes 1--5\% of total traffic in production environments).
 
 In \ASRRL{}, DBSCAN is applied specifically to \emph{misclassified} flows rather than all traffic. This targeted application has two advantages: it focuses computational resources on the flows most likely to represent novel attacks (since correctly classified flows are, by definition, already handled by the existing constraint set), and it avoids the curse of dimensionality that affects full-traffic clustering by operating on a smaller, more homogeneous subset of the feature space.
 
@@ -504,9 +503,9 @@ In \ASRRL{}, DBSCAN is applied specifically to \emph{misclassified} flows rather
 
 Zero-day attack detection, which involves identifying attacks that exploit previously unknown vulnerabilities, remains an open problem in network security. The difficulty is that zero-day attacks, by definition, have no prior examples in the training data, so supervised classifiers cannot learn to detect them directly.
 
-Xin et al.~\citep{xin2018} surveyed ML and deep learning methods for cybersecurity and identified three dominant approaches to zero-day detection: anomaly-based methods that model normal behavior and flag deviations, generative methods that synthesize hypothetical attack samples for training, and transfer learning methods that leverage knowledge from known attack types to detect novel ones. They concluded that none of these approaches provides formal guarantees about detection completeness, leaving a gap that \ASRRL{}'s Z3-backed constraint injection is designed to fill.
+Xin et al.~\cite{xin2018} surveyed ML and deep learning methods for cybersecurity and identified three dominant approaches to zero-day detection: anomaly-based methods that model normal behavior and flag deviations, generative methods that synthesize hypothetical attack samples for training, and transfer learning methods that leverage knowledge from known attack types to detect novel ones. They concluded that none of these approaches provides formal guarantees about detection completeness, leaving a gap that \ASRRL{}'s Z3-backed constraint injection is designed to fill.
 
-Otoum et al.~\citep{otoum2019} explored the feasibility of deep learning for sensor network intrusion detection, comparing autoencoders, restricted Boltzmann machines, and deep belief networks on the NSL-KDD dataset. Their analysis showed that deep autoencoders achieved the best unsupervised detection performance (AUC = 0.94 for known attacks), but performance dropped to AUC = 0.71 for attack types not seen during training, underscoring the difficulty of zero-day detection even with powerful representation learning.
+Otoum et al.~\cite{otoum2019} explored the feasibility of deep learning for sensor network intrusion detection, comparing autoencoders, restricted Boltzmann machines, and deep belief networks on the NSL-KDD dataset. Their analysis showed that deep autoencoders achieved the best unsupervised detection performance (AUC = 0.94 for known attacks), but performance dropped to AUC = 0.71 for attack types not seen during training, underscoring the difficulty of zero-day detection even with powerful representation learning.
 
 These studies raise critical questions about whether zero-day detection can be achieved without formal guarantees about the detection mechanism's coverage. While anomaly-based and generative approaches offer probabilistic detection of novel attacks, none provides a verifiable constraint set that explicitly encodes the conditions under which a novel pattern is classified as malicious. The \ASRRL{} framework addresses this gap through DBSCAN clustering of misclassified flows followed by Z3 constraint injection, enabling the system to detect and formally encode novel attack patterns without requiring labeled examples or computationally expensive deep generative models. This approach transforms zero-day detection from a purely statistical problem into a hybrid statistical-symbolic one, where newly discovered patterns are immediately formalized as verifiable constraints.
 
@@ -516,21 +515,21 @@ These studies raise critical questions about whether zero-day detection can be a
 
 \subsection{Post-Hoc Explanation Methods}
 
-LIME (Local Interpretable Model-agnostic Explanations), introduced by Ribeiro et al.~\citep{ribeiro2016}, generates local explanations by fitting an interpretable surrogate model (typically a sparse linear model) to the neighborhood of a prediction. LIME perturbs the input features, queries the black-box model on the perturbed instances, and trains the surrogate to approximate the model's local behavior. In cybersecurity, Marino et al.~\citep{marino2018} applied LIME to explain Random Forest IDS predictions on NSL-KDD, finding that the top-3 explanatory features (service type, flag, and source bytes) were consistent with domain knowledge. However, they also observed that LIME's explanations were unstable, as running LIME twice on the same prediction could produce different feature importance rankings due to the stochastic perturbation process.
+LIME (Local Interpretable Model-agnostic Explanations), introduced by Ribeiro et al.~\cite{ribeiro2016}, generates local explanations by fitting an interpretable surrogate model (typically a sparse linear model) to the neighborhood of a prediction. LIME perturbs the input features, queries the black-box model on the perturbed instances, and trains the surrogate to approximate the model's local behavior. In cybersecurity, Marino et al.~\cite{marino2018} applied LIME to explain Random Forest IDS predictions on NSL-KDD, finding that the top-3 explanatory features (service type, flag, and source bytes) were consistent with domain knowledge. However, they also observed that LIME's explanations were unstable, as running LIME twice on the same prediction could produce different feature importance rankings due to the stochastic perturbation process.
 
-SHAP (SHapley Additive exPlanations), proposed by Lundberg and Lee~\citep{lundberg2017}, provides a more theoretically grounded explanation framework based on cooperative game theory. SHAP assigns each feature a Shapley value representing its marginal contribution to the prediction, with the property that Shapley values are the unique attribution method satisfying local accuracy, missingness, and consistency axioms. In IDS applications, SHAP has been used to identify the most influential features in malware detection and to validate that classifiers are not relying on spurious correlations.
+SHAP (SHapley Additive exPlanations), proposed by Lundberg and Lee~\cite{lundberg2017}, provides a more theoretically grounded explanation framework based on cooperative game theory. SHAP assigns each feature a Shapley value representing its marginal contribution to the prediction, with the property that Shapley values are the unique attribution method satisfying local accuracy, missingness, and consistency axioms. In IDS applications, SHAP has been used to identify the most influential features in malware detection and to validate that classifiers are not relying on spurious correlations.
 
-However, post-hoc explanations have fundamental limitations that are particularly concerning in security-critical settings. Slack et al.~\citep{slack2020} demonstrated that LIME and SHAP explanations can be manipulated by adversaries who construct models that behave differently in the neighborhood queried by the explanation method than in the broader input space. Their ``fooling LIME and SHAP'' attack showed that a biased classifier could produce explanations indistinguishable from those of an unbiased classifier, undermining the trustworthiness of post-hoc explanations. Molnar~\citep{molnar2020} argued that this vulnerability is inherent to post-hoc methods: because they \emph{approximate} the model's behavior rather than \emph{constituting} it, there is no formal guarantee that the explanation faithfully represents the actual decision process.
+However, post-hoc explanations have fundamental limitations that are particularly concerning in security-critical settings. Slack et al.~\cite{slack2020} demonstrated that LIME and SHAP explanations can be manipulated by adversaries who construct models that behave differently in the neighborhood queried by the explanation method than in the broader input space. Their ``fooling LIME and SHAP'' attack showed that a biased classifier could produce explanations indistinguishable from those of an unbiased classifier, undermining the trustworthiness of post-hoc explanations. Molnar~\cite{molnar2020} argued that this vulnerability is inherent to post-hoc methods: because they \emph{approximate} the model's behavior rather than \emph{constituting} it, there is no formal guarantee that the explanation faithfully represents the actual decision process.
 
 These studies raise critical questions about whether post-hoc explanation methods can ever provide the level of trustworthiness required in security-critical systems. The demonstrated susceptibility of LIME and SHAP to adversarial manipulation suggests that explanation fidelity, not merely explanation availability, must be a design requirement. The \ASRRL{} framework sidesteps the limitations of post-hoc methods entirely by deriving its explanations directly from the Z3 constraints that govern classification decisions, ensuring that explanations are provably faithful to the actual decision process rather than approximations that can be subverted.
 
 \subsection{Inherently Interpretable Models}
 
-Decision trees and rule-based systems are inherently interpretable, as each prediction can be traced to a specific path of feature comparisons. Molnar~\citep{molnar2020} argued that inherently interpretable models should be preferred over post-hoc explanations when the stakes are high, because their explanations are guaranteed to be faithful because the explanation \emph{is} the decision process, not an approximation of it. In the IDS domain, Buczak and Guven~\citep{buczak2016} surveyed 35 rule-based IDS approaches published between 2000 and 2015, noting that while rule-based systems provide excellent interpretability, they consistently underperform ML-based methods on modern datasets due to their inability to learn complex feature interactions and their reliance on manually authored rules that cannot adapt to evolving threats.
+Decision trees and rule-based systems are inherently interpretable, as each prediction can be traced to a specific path of feature comparisons. Molnar~\cite{molnar2020} argued that inherently interpretable models should be preferred over post-hoc explanations when the stakes are high, because their explanations are guaranteed to be faithful because the explanation \emph{is} the decision process, not an approximation of it. In the IDS domain, Buczak and Guven~\cite{buczak2016} surveyed 35 rule-based IDS approaches published between 2000 and 2015, noting that while rule-based systems provide excellent interpretability, they consistently underperform ML-based methods on modern datasets due to their inability to learn complex feature interactions and their reliance on manually authored rules that cannot adapt to evolving threats.
 
-Lin et al.~\citep{lin2022} proposed a rule-extraction approach that trains a neural network classifier and then distills its knowledge into a set of human-readable rules using the DeepRED algorithm. Their approach achieved 95.3\% accuracy on NSL-KDD with a rule set containing 47 rules, each involving 3--5 feature conditions. While this approach provides interpretable rules with competitive accuracy, the rules are static after extraction and cannot adapt to novel attacks without retraining the underlying neural network and re-extracting the rules.
+Lin et al.~\cite{lin2022} proposed a rule-extraction approach that trains a neural network classifier and then distills its knowledge into a set of human-readable rules using the DeepRED algorithm. Their approach achieved 95.3\% accuracy on NSL-KDD with a rule set containing 47 rules, each involving 3--5 feature conditions. While this approach provides interpretable rules with competitive accuracy, the rules are static after extraction and cannot adapt to novel attacks without retraining the underlying neural network and re-extracting the rules.
 
-The \ASRRL{} framework combines the interpretability of decision trees with the adaptability of RL and the formal guarantees of SMT solving. This combination achieves a form of interpretability that goes beyond both post-hoc explanations and static rule systems. Because \ASRRL{}'s explanations are derived directly from the Z3 constraints that \emph{actually govern} the system's decisions (rather than from post-hoc approximation methods), they are provably faithful to the decision process and immune to the manipulation attacks demonstrated by Slack et al.~\citep{slack2020}.
+The \ASRRL{} framework combines the interpretability of decision trees with the adaptability of RL and the formal guarantees of SMT solving. This combination achieves a form of interpretability that goes beyond both post-hoc explanations and static rule systems. Because \ASRRL{}'s explanations are derived directly from the Z3 constraints that \emph{actually govern} the system's decisions (rather than from post-hoc approximation methods), they are provably faithful to the decision process and immune to the manipulation attacks demonstrated by Slack et al.~\cite{slack2020}.
 
 
 \section{Research Gap}
@@ -566,17 +565,17 @@ The literature reveals a clear gap: no existing IDS framework provides simultane
 
 While the studies reviewed in this chapter have collectively advanced the state of network intrusion detection, each exhibits specific limitations that motivate the present work. This section synthesizes the key shortcomings across six categories of prior approaches.
 
-\textbf{Ensemble and Deep Learning Methods.} Random Forest, XGBoost, LightGBM, and deep learning architectures (CNN, LSTM) consistently achieve high classification accuracy~\citep{buczak2016,ahmad2021}, yet they operate as black-box models whose internal decision logic cannot be expressed as verifiable logical predicates. This opacity prevents security analysts from determining why a particular flow was blocked or allowed, which impedes regulatory compliance (e.g., NIST SP~800-53, EU~AI~Act) and analyst trust. Moreover, these models are static after deployment and cannot adapt to novel attack patterns without full offline retraining on updated datasets.
+\textbf{Ensemble and Deep Learning Methods.} Random Forest, XGBoost, LightGBM, and deep learning architectures (CNN, LSTM) consistently achieve high classification accuracy~\cite{buczak2016,ahmad2021}, yet they operate as black-box models whose internal decision logic cannot be expressed as verifiable logical predicates. This opacity prevents security analysts from determining why a particular flow was blocked or allowed, which impedes regulatory compliance (e.g., NIST SP~800-53, EU~AI~Act) and analyst trust. Moreover, these models are static after deployment and cannot adapt to novel attack patterns without full offline retraining on updated datasets.
 
-\textbf{Rule-Based and Signature Systems.} Traditional systems such as Snort~\citep{roesch1999} and Suricata provide full interpretability and domain knowledge integration but suffer from the fundamental inability to adapt to novel attack patterns without manual rule authoring. Reported F1-scores on modern datasets typically fall below 0.70~\citep{ahmad2021}, and zero-day attacks consistently evade signature-based detection.
+\textbf{Rule-Based and Signature Systems.} Traditional systems such as Snort~\cite{roesch1999} and Suricata provide full interpretability and domain knowledge integration but suffer from the fundamental inability to adapt to novel attack patterns without manual rule authoring. Reported F1-scores on modern datasets typically fall below 0.70~\cite{ahmad2021}, and zero-day attacks consistently evade signature-based detection.
 
 \textbf{Reinforcement Learning for IDS.} Prior RL-based IDS approaches demonstrate adaptive policy learning but lack formal safety guarantees during exploration. During training, the RL agent may select actions that allow malicious traffic through the network while learning its policy, creating a window of vulnerability. Additionally, most RL-based IDS approaches use opaque deep neural network policies that are no more interpretable than the ensemble methods they aim to replace.
 
-\textbf{Safe and Shielded RL.} Approaches such as SafeRL-IDS~\citep{wang2022saferl} and Shield-RL~\citep{kumar2023shield} address unsafe exploration through action filtering or constrained optimization. However, SafeRL-IDS achieves safety without interpretability (F1~=~0.79, no decision traceability), while Shield-RL provides only partial formal guarantees because its shielding mechanism is not grounded in a formally verified constraint set derived from the data.
+\textbf{Safe and Shielded RL.} Approaches such as SafeRL-IDS~\cite{wang2022saferl} and Shield-RL~\cite{kumar2023shield} address unsafe exploration through action filtering or constrained optimization. However, SafeRL-IDS achieves safety without interpretability (F1~=~0.79, no decision traceability), while Shield-RL provides only partial formal guarantees because its shielding mechanism is not grounded in a formally verified constraint set derived from the data.
 
-\textbf{Neurosymbolic Approaches.} DeepSymNet~\citep{zhang2021deepsymnet} and LogicIDS~\citep{li2021logicids} combine symbolic reasoning with neural components but lack runtime adaptation. DeepSymNet extracts post-hoc symbolic rules from trained networks (F1~=~0.75) but cannot update its rules without complete retraining. LogicIDS provides partial formal guarantees but its constraint set is static and cannot incorporate novel attack patterns discovered after deployment.
+\textbf{Neurosymbolic Approaches.} DeepSymNet~\cite{zhang2021deepsymnet} and LogicIDS~\cite{li2021logicids} combine symbolic reasoning with neural components but lack runtime adaptation. DeepSymNet extracts post-hoc symbolic rules from trained networks (F1~=~0.75) but cannot update its rules without complete retraining. LogicIDS provides partial formal guarantees but its constraint set is static and cannot incorporate novel attack patterns discovered after deployment.
 
-\textbf{Our Prior Work (Young, 2025).} Our previously published framework~\citep{young2025adaptive} demonstrated the feasibility of integrating Z3 SMT constraint verification with Q-learning for network traffic classification, achieving F1~=~0.773 with 33\% false negative reduction and 1,247 shield activations during training. However, that work exhibited several limitations that the present dissertation directly addresses:
+\textbf{Our Prior Work (Young, 2025).} Our previously published framework~\cite{young2025adaptive} demonstrated the feasibility of integrating Z3 SMT constraint verification with Q-learning for network traffic classification, achieving F1~=~0.773 with 33\% false negative reduction and 1,247 shield activations during training. However, that work exhibited several limitations that the present dissertation directly addresses:
 \begin{itemize}
     \item \textbf{No online novel attack detection.} The constraint set was derived solely from the initial decision tree and remained static throughout training and inference. Novel attack patterns encountered after deployment were handled only by the RL agent's policy, without any mechanism to generate new Z3 constraints.
     \item \textbf{No dynamic buffer or threshold adaptation.} The buffer size, classification threshold, and all operational parameters were fixed at deployment, preventing the system from adjusting its sensitivity as attack distributions shifted.
@@ -1207,7 +1206,7 @@ MISP ThreatFox & 2024 & 2,136,408 & 13 & 35\% & varies \\
 
 \subsection{UNSW-NB15}
 
-The UNSW-NB15 dataset was created by Moustafa and Slay~\citep{moustafa2015} at the Australian Centre for Cyber Security, University of New South Wales. It contains approximately 2.54 million network flows generated in a controlled cyber range environment using the IXIA PerfectStorm traffic generation tool. The dataset spans nine attack categories---Fuzzers, Analysis, Backdoors, Denial of Service (DoS), Exploits, Generic, Reconnaissance, Shellcode, and Worms---with a 30\% attack-to-benign ratio. Each flow is described by 49 raw features derived from packet headers, flow statistics, and content-based attributes. UNSW-NB15 was selected for this evaluation because its diverse attack categories enable testing of the novel attack detection mechanism (the holdout types---backdoor, shellcode, worms, analysis, and reconnaissance---represent a broad spectrum of adversarial behavior), and its moderate class imbalance reflects realistic deployment conditions.
+The UNSW-NB15 dataset was created by Moustafa and Slay~\cite{moustafa2015} at the Australian Centre for Cyber Security, University of New South Wales. It contains approximately 2.54 million network flows generated in a controlled cyber range environment using the IXIA PerfectStorm traffic generation tool. The dataset spans nine attack categories---Fuzzers, Analysis, Backdoors, Denial of Service (DoS), Exploits, Generic, Reconnaissance, Shellcode, and Worms---with a 30\% attack-to-benign ratio. Each flow is described by 49 raw features derived from packet headers, flow statistics, and content-based attributes. UNSW-NB15 was selected for this evaluation because its diverse attack categories enable testing of the novel attack detection mechanism (the holdout types---backdoor, shellcode, worms, analysis, and reconnaissance---represent a broad spectrum of adversarial behavior), and its moderate class imbalance reflects realistic deployment conditions.
 
 \subsection{CSE-CIC-IDS-2018}
 
@@ -1215,7 +1214,7 @@ The CSE-CIC-IDS-2018 dataset was developed by the Canadian Centre for Cyber Secu
 
 \subsection{CIC-IDS2017}
 
-The CIC-IDS2017 dataset~\citep{sharafaldin2018} was created by the Canadian Institute for Cybersecurity at the University of New Brunswick. It contains 3.12 million flows across 14 attack types---including Brute Force (FTP and SSH), DoS (Hulk, GoldenEye, Slowloris, Slowhttptest), Heartbleed, Web Attack (SQL Injection, XSS, Brute Force), Infiltration, Botnet, and DDoS (LOIC)---executed over a five-day period in a controlled lab environment. Each flow is characterized by 80 features extracted by CICFlowMeter. The temporal structure of the dataset, with different attack types deployed on different days, makes it particularly suitable for the temporally phased novel attack experiment. The holdout attack types (DDoS, Bot, DoS Slowhttptest, DoS Slowloris) were selected because they represent high-impact attack categories that an IDS deployed early in the week would not have encountered during training.
+The CIC-IDS2017 dataset~\cite{sharafaldin2018} was created by the Canadian Institute for Cybersecurity at the University of New Brunswick. It contains 3.12 million flows across 14 attack types---including Brute Force (FTP and SSH), DoS (Hulk, GoldenEye, Slowloris, Slowhttptest), Heartbleed, Web Attack (SQL Injection, XSS, Brute Force), Infiltration, Botnet, and DDoS (LOIC)---executed over a five-day period in a controlled lab environment. Each flow is characterized by 80 features extracted by CICFlowMeter. The temporal structure of the dataset, with different attack types deployed on different days, makes it particularly suitable for the temporally phased novel attack experiment. The holdout attack types (DDoS, Bot, DoS Slowhttptest, DoS Slowloris) were selected because they represent high-impact attack categories that an IDS deployed early in the week would not have encountered during training.
 
 \subsection{MISP ThreatFox Integration}
 
@@ -1794,7 +1793,7 @@ These results confirm that the 10-feature schema retains sufficient discriminati
 \section{Comparison with Prior Work (Young, 2025)}
 \label{sec:prior_comparison}
 
-This section presents a direct empirical comparison between the \ASRRL{} framework introduced in this dissertation and our previously published approach~\citep{young2025adaptive}, which integrated Z3 SMT constraint verification with Q-learning for adaptive network traffic classification. The prior work was evaluated on UNSW-NB15, CIC-IDS2017, and KDD~Cup~99 datasets and represents the first iteration of the symbolic-RL IDS concept. The comparison quantifies the improvements achieved by the five contributions of the present work.
+This section presents a direct empirical comparison between the \ASRRL{} framework introduced in this dissertation and our previously published approach~\cite{young2025adaptive}, which integrated Z3 SMT constraint verification with Q-learning for adaptive network traffic classification. The prior work was evaluated on UNSW-NB15, CIC-IDS2017, and KDD~Cup~99 datasets and represents the first iteration of the symbolic-RL IDS concept. The comparison quantifies the improvements achieved by the five contributions of the present work.
 
 \subsection{Architecture Differences}
 
@@ -1843,7 +1842,7 @@ Datasets Evaluated & 3 & 4 \\
 
 \subsection{What the Prior Work Contributed}
 
-Despite its limitations, the prior framework~\citep{young2025adaptive} made foundational contributions that the present work builds upon:
+Despite its limitations, the prior framework~\cite{young2025adaptive} made foundational contributions that the present work builds upon:
 \begin{itemize}
     \item It established the \emph{viability} of combining Z3 SMT solving with reinforcement learning for IDS, demonstrating that formal constraint verification could be integrated into an RL training loop without prohibitive computational cost.
     \item It introduced the \emph{symbolic safety shield} concept for IDS, showing that Z3-verified action filtering could prevent unsafe actions during RL exploration (1,247 shield activations).
@@ -1974,254 +1973,155 @@ The \ASRRL{} framework demonstrates that formal verifiability, online adaptabili
 
 \begin{thebibliography}{99}
 
-\bibitem[Young(2025)]{young2025adaptive}
-Young, P.C., III (2025).
-Adaptive symbolic reasoning and reinforcement learning for dynamic network traffic classification.
-\textit{IEEE Wireless Communications and Networking Conference (WCNC)}, pp.\ 1--8. IEEE.
+\bibitem{young2025adaptive}
+P.~C. Young~III, ``Adaptive symbolic reasoning and reinforcement learning for dynamic network traffic classification,'' in \textit{Proc. IEEE Wireless Commun. Netw. Conf. (WCNC)}, 2025, pp.~1--8.
 
-\bibitem[Alshiekh et~al.(2018)]{alshiekh2018}
-Alshiekh, M., Bloem, R., Ehlers, R., K{\"o}nighofer, B., Niekum, S., and Topcu, U. (2018).
-Safe reinforcement learning via shielding.
-\textit{Proceedings of the AAAI Conference on Artificial Intelligence}, 32(1).
+\bibitem{alshiekh2018}
+M. Alshiekh, R. Bloem, R. Ehlers, B. K{\"o}nighofer, S. Niekum, and U. Topcu, ``Safe reinforcement learning via shielding,'' in \textit{Proc. AAAI Conf. Artif. Intell.}, vol.~32, no.~1, 2018.
 
-\bibitem[Avgerinos et~al.(2014)]{avgerinos2014}
-Avgerinos, T., Cha, S.K., Rebert, A., Schwartz, E.J., Woo, M., and Brumley, D. (2014).
-Automatic exploit generation.
-\textit{Communications of the ACM}, 57(2):74--84.
+\bibitem{avgerinos2014}
+T. Avgerinos, S.~K. Cha, A. Rebert, E.~J. Schwartz, M. Woo, and D. Brumley, ``Automatic exploit generation,'' \textit{Commun. ACM}, vol.~57, no.~2, pp.~74--84, 2014.
 
-\bibitem[Barbero et~al.(2022)]{barbero2022}
-Barbero, F., Pendlebury, F., Pierazzi, F., and Cavallaro, L. (2022).
-Transcending transcend: Revisiting malware classification in the presence of concept drift.
-\textit{IEEE Symposium on Security and Privacy (SP)}, pp.\ 1165--1183.
+\bibitem{barbero2022}
+F. Barbero, F. Pendlebury, F. Pierazzi, and L. Cavallaro, ``Transcending transcend: Revisiting malware classification in the presence of concept drift,'' in \textit{Proc. IEEE Symp. Security Privacy (SP)}, 2022, pp.~1165--1183.
 
-\bibitem[Bhargavan et~al.(2017)]{bhargavan2017}
-Bhargavan, K., Blanchet, B., and Kobeissi, N. (2017).
-Verified models and reference implementations for the TLS 1.3 standard candidate.
-\textit{IEEE Symposium on Security and Privacy (SP)}, pp.\ 483--502.
+\bibitem{bhargavan2017}
+K. Bhargavan, B. Blanchet, and N. Kobeissi, ``Verified models and reference implementations for the TLS 1.3 standard candidate,'' in \textit{Proc. IEEE Symp. Security Privacy (SP)}, 2017, pp.~483--502.
 
-\bibitem[Buczak and Guven(2016)]{buczak2016}
-Buczak, A.L. and Guven, E. (2016).
-A survey of data mining and machine learning methods for cyber security intrusion detection.
-\textit{IEEE Communications Surveys \& Tutorials}, 18(2):1153--1176.
+\bibitem{buczak2016}
+A.~L. Buczak and E. Guven, ``A survey of data mining and machine learning methods for cyber security intrusion detection,'' \textit{IEEE Commun. Surveys Tuts.}, vol.~18, no.~2, pp.~1153--1176, 2016.
 
-\bibitem[Cadar et~al.(2008)]{cadar2008}
-Cadar, C., Dunbar, D., and Engler, D.R. (2008).
-KLEE: Unassisted and automatic generation of high-coverage tests for complex systems programs.
-\textit{OSDI}, 8:209--224.
+\bibitem{cadar2008}
+C. Cadar, D. Dunbar, and D.~R. Engler, ``KLEE: Unassisted and automatic generation of high-coverage tests for complex systems programs,'' in \textit{Proc. OSDI}, vol.~8, 2008, pp.~209--224.
 
-\bibitem[Tang et~al.(2020)]{tang2020}
-Tang, C., Luktarhan, N., and Zhao, Y. (2020).
-An efficient intrusion detection method based on LightGBM and autoencoder.
-\textit{Symmetry}, 12(9):1458.
+\bibitem{tang2020}
+C. Tang, N. Luktarhan, and Y. Zhao, ``An efficient intrusion detection method based on LightGBM and autoencoder,'' \textit{Symmetry}, vol.~12, no.~9, p.~1458, 2020.
 
-\bibitem[de Moura and Bj{\o}rner(2008)]{demoura2008}
-de Moura, L. and Bj{\o}rner, N. (2008).
-Z3: An efficient SMT solver.
-\textit{International Conference on Tools and Algorithms for the Construction and Analysis of Systems}, pp.\ 337--340. Springer.
+\bibitem{demoura2008}
+L. de~Moura and N. Bj{\o}rner, ``Z3: An efficient SMT solver,'' in \textit{Proc. Int. Conf. Tools Algorithms Construction Anal. Syst.}, Springer, 2008, pp.~337--340.
 
-\bibitem[Dhaliwal et~al.(2018)]{dhaliwal2018}
-Dhaliwal, S.S., Nahid, A.A., and Abbas, R. (2018).
-Effective intrusion detection system using XGBoost.
-\textit{Information}, 9(7):149.
+\bibitem{dhaliwal2018}
+S.~S. Dhaliwal, A.~A. Nahid, and R. Abbas, ``Effective intrusion detection system using XGBoost,'' \textit{Information}, vol.~9, no.~7, p.~149, 2018.
 
-\bibitem[Ester et~al.(1996)]{ester1996}
-Ester, M., Kriegel, H.P., Sander, J., and Xu, X. (1996).
-A density-based algorithm for discovering clusters in large spatial databases with noise.
-\textit{KDD}, 96(34):226--231.
+\bibitem{ester1996}
+M. Ester, H.~P. Kriegel, J. Sander, and X. Xu, ``A density-based algorithm for discovering clusters in large spatial databases with noise,'' in \textit{Proc. KDD}, vol.~96, no.~34, 1996, pp.~226--231.
 
-\bibitem[Farnaaz and Jabbar(2016)]{farnaaz2016}
-Farnaaz, N. and Jabbar, M.A. (2016).
-Random forest modeling for network intrusion detection system.
-\textit{Procedia Computer Science}, 89:213--217.
+\bibitem{farnaaz2016}
+N. Farnaaz and M.~A. Jabbar, ``Random forest modeling for network intrusion detection system,'' \textit{Procedia Comput. Sci.}, vol.~89, pp.~213--217, 2016.
 
-\bibitem[Garcez et~al.(2019)]{garcez2019}
-Garcez, A.d., Gori, M., Lamb, L.C., Serafini, L., Spranger, M., and Tran, S.N. (2019).
-Neural-symbolic computing: An effective methodology for principled integration of machine learning and reasoning.
-\textit{Journal of Applied Logics}, 6(4):611--632.
+\bibitem{garcez2019}
+A.~d. Garcez, M. Gori, L.~C. Lamb, L. Serafini, M. Spranger, and S.~N. Tran, ``Neural-symbolic computing: An effective methodology for principled integration of machine learning and reasoning,'' \textit{J. Appl. Logics}, vol.~6, no.~4, pp.~611--632, 2019.
 
-\bibitem[Hasanbeig et~al.(2020)]{hasanbeig2020}
-Hasanbeig, M., Abate, A., and Kroening, D. (2020).
-Cautious reinforcement learning with logical constraints.
-\textit{International Conference on Autonomous Agents and MultiAgent Systems}, pp.\ 483--491.
+\bibitem{hasanbeig2020}
+M. Hasanbeig, A. Abate, and D. Kroening, ``Cautious reinforcement learning with logical constraints,'' in \textit{Proc. Int. Conf. Auton. Agents MultiAgent Syst.}, 2020, pp.~483--491.
 
-\bibitem[Caminero et~al.(2019)]{caminero2019}
-Caminero, G., Lopez-Martin, M., and Carro, B. (2019).
-Adversarial environment reinforcement learning algorithm for intrusion detection.
-\textit{Computer Networks}, 159:96--109.
+\bibitem{caminero2019}
+G. Caminero, M. Lopez-Martin, and B. Carro, ``Adversarial environment reinforcement learning algorithm for intrusion detection,'' \textit{Comput. Netw.}, vol.~159, pp.~96--109, 2019.
 
-\bibitem[Wu et~al.(2022)]{wu2022}
-Wu, Z., Zhang, H., Wang, P., and Sun, Z. (2022).
-RTIDS: A robust transformer-based approach for intrusion detection system.
-\textit{IEEE Access}, 10:64375--64387.
+\bibitem{wu2022}
+Z. Wu, H. Zhang, P. Wang, and Z. Sun, ``RTIDS: A robust transformer-based approach for intrusion detection system,'' \textit{IEEE Access}, vol.~10, pp.~64375--64387, 2022.
 
-\bibitem[Jansen et~al.(2020)]{jansen2020}
-Jansen, N., K{\"o}nighofer, B., Junges, S., Serban, A., and Bloem, R. (2020).
-Safe reinforcement learning using probabilistic shields.
-\textit{CONCUR 2020}, 171:3:1--3:16.
+\bibitem{jansen2020}
+N. Jansen, B. K{\"o}nighofer, S. Junges, A. Serban, and R. Bloem, ``Safe reinforcement learning using probabilistic shields,'' in \textit{Proc. CONCUR}, vol.~171, 2020, pp.~3:1--3:16.
 
-\bibitem[Jordaney et~al.(2017)]{jordaney2017}
-Jordaney, R., Sharad, K., Dash, S.K., Wang, Z., Papini, D., Nouretdinov, I., and Cavallaro, L. (2017).
-Transcend: Detecting concept drift in malware classification models.
-\textit{USENIX Security Symposium}, pp.\ 625--642.
+\bibitem{jordaney2017}
+R. Jordaney, K. Sharad, S.~K. Dash, Z. Wang, D. Papini, I. Nouretdinov, and L. Cavallaro, ``Transcend: Detecting concept drift in malware classification models,'' in \textit{Proc. USENIX Security Symp.}, 2017, pp.~625--642.
 
-\bibitem[Ke et~al.(2017)]{ke2017}
-Ke, G., Meng, Q., Finley, T., Wang, T., Chen, W., Ma, W., Ye, Q., and Liu, T.Y. (2017).
-LightGBM: A highly efficient gradient boosting decision tree.
-\textit{Advances in Neural Information Processing Systems}, 30.
+\bibitem{ke2017}
+G. Ke, Q. Meng, T. Finley, T. Wang, W. Chen, W. Ma, Q. Ye, and T.~Y. Liu, ``LightGBM: A highly efficient gradient boosting decision tree,'' in \textit{Advances Neural Inf. Process. Syst.}, vol.~30, 2017.
 
-\bibitem[Kim et~al.(2016)]{kim2016}
-Kim, J., Kim, J., Thu, H.L.T., and Kim, H. (2016).
-Long short-term memory recurrent neural network classifier for intrusion detection.
-\textit{Platform Technology and Service (PlatCon)}, pp.\ 1--5.
+\bibitem{kim2016}
+J. Kim, J. Kim, H.~L.~T. Thu, and H. Kim, ``Long short-term memory recurrent neural network classifier for intrusion detection,'' in \textit{Proc. Platform Technol. Service (PlatCon)}, 2016, pp.~1--5.
 
-\bibitem[Lee and Stolfo(1998)]{lee1998}
-Lee, W. and Stolfo, S.J. (1998).
-Data mining approaches for intrusion detection.
-\textit{USENIX Security Symposium}, pp.\ 79--94.
+\bibitem{lee1998}
+W. Lee and S.~J. Stolfo, ``Data mining approaches for intrusion detection,'' in \textit{Proc. USENIX Security Symp.}, 1998, pp.~79--94.
 
-\bibitem[Leung and Leckie(2005)]{leung2005}
-Leung, K. and Leckie, C. (2005).
-Unsupervised anomaly detection in network intrusion detection using clusters.
-\textit{Australasian Computer Science Conference}, pp.\ 333--342.
+\bibitem{leung2005}
+K. Leung and C. Leckie, ``Unsupervised anomaly detection in network intrusion detection using clusters,'' in \textit{Proc. Australasian Comput. Sci. Conf.}, 2005, pp.~333--342.
 
-\bibitem[Lopez-Martin et~al.(2020)]{lopez2020}
-Lopez-Martin, M., Carro, B., and Sanchez-Esguevillas, A. (2020).
-Application of deep reinforcement learning to intrusion detection for supervised problems.
-\textit{Expert Systems with Applications}, 141:112963.
+\bibitem{lopez2020}
+M. Lopez-Martin, B. Carro, and A. Sanchez-Esguevillas, ``Application of deep reinforcement learning to intrusion detection for supervised problems,'' \textit{Expert Syst. Appl.}, vol.~141, p.~112963, 2020.
 
-\bibitem[Lundberg and Lee(2017)]{lundberg2017}
-Lundberg, S.M. and Lee, S.I. (2017).
-A unified approach to interpreting model predictions.
-\textit{Advances in Neural Information Processing Systems}, 30.
+\bibitem{lundberg2017}
+S.~M. Lundberg and S.~I. Lee, ``A unified approach to interpreting model predictions,'' in \textit{Advances Neural Inf. Process. Syst.}, vol.~30, 2017.
 
-\bibitem[Mao et~al.(2019)]{mao2019}
-Mao, J., Gan, C., Kohli, P., Tenenbaum, J.B., and Wu, J. (2019).
-The neuro-symbolic concept learner.
-\textit{International Conference on Learning Representations}.
+\bibitem{mao2019}
+J. Mao, C. Gan, P. Kohli, J.~B. Tenenbaum, and J. Wu, ``The neuro-symbolic concept learner,'' in \textit{Proc. Int. Conf. Learn. Representations (ICLR)}, 2019.
 
-\bibitem[Marino et~al.(2018)]{marino2018}
-Marino, D.L., Wickramasinghe, C.S., and Manic, M. (2018).
-An adversarial approach for explainable AI in intrusion detection systems.
-\textit{IECON 2018}, pp.\ 3237--3243.
+\bibitem{marino2018}
+D.~L. Marino, C.~S. Wickramasinghe, and M. Manic, ``An adversarial approach for explainable AI in intrusion detection systems,'' in \textit{Proc. IECON}, 2018, pp.~3237--3243.
 
-\bibitem[Molnar(2020)]{molnar2020}
-Molnar, C. (2020).
-\textit{Interpretable Machine Learning}. Lulu.com.
+\bibitem{molnar2020}
+C. Molnar, \textit{Interpretable Machine Learning}. Lulu.com, 2020.
 
-\bibitem[Moustafa and Slay(2015)]{moustafa2015}
-Moustafa, N. and Slay, J. (2015).
-UNSW-NB15: A comprehensive data set for network intrusion detection systems.
-\textit{Military Communications and Information Systems Conference (MilCIS)}, pp.\ 1--6.
+\bibitem{moustafa2015}
+N. Moustafa and J. Slay, ``UNSW-NB15: A comprehensive data set for network intrusion detection systems,'' in \textit{Proc. Military Commun. Inf. Syst. Conf. (MilCIS)}, 2015, pp.~1--6.
 
-\bibitem[Nguyen and Reddi(2021)]{nguyen2021}
-Nguyen, T.T. and Reddi, V.J. (2021).
-Deep reinforcement learning for cyber security.
-\textit{IEEE Transactions on Neural Networks and Learning Systems}, 34(8):3779--3795.
+\bibitem{nguyen2021}
+T.~T. Nguyen and V.~J. Reddi, ``Deep reinforcement learning for cyber security,'' \textit{IEEE Trans. Neural Netw. Learn. Syst.}, vol.~34, no.~8, pp.~3779--3795, 2021.
 
-\bibitem[Ribeiro et~al.(2016)]{ribeiro2016}
-Ribeiro, M.T., Singh, S., and Guestrin, C. (2016).
-``Why should I trust you?'' Explaining the predictions of any classifier.
-\textit{ACM SIGKDD International Conference on Knowledge Discovery and Data Mining}, pp.\ 1135--1144.
+\bibitem{ribeiro2016}
+M.~T. Ribeiro, S. Singh, and C. Guestrin, ``Why should I trust you? Explaining the predictions of any classifier,'' in \textit{Proc. ACM SIGKDD Int. Conf. Knowl. Discovery Data Mining}, 2016, pp.~1135--1144.
 
-\bibitem[Sethi and Kantardzic(2018)]{sethi2018}
-Sethi, T.S. and Kantardzic, M. (2018).
-Handling adversarial concept drift in streaming data.
-\textit{Expert Systems with Applications}, 97:18--40.
+\bibitem{sethi2018}
+T.~S. Sethi and M. Kantardzic, ``Handling adversarial concept drift in streaming data,'' \textit{Expert Syst. Appl.}, vol.~97, pp.~18--40, 2018.
 
-\bibitem[Shone et~al.(2018)]{shone2018}
-Shone, N., Ngoc, T.N., Phai, V.D., and Shi, Q. (2018).
-A deep learning approach to network intrusion detection.
-\textit{IEEE Transactions on Emerging Topics in Computational Intelligence}, 2(1):41--50.
+\bibitem{shone2018}
+N. Shone, T.~N. Ngoc, V.~D. Phai, and Q. Shi, ``A deep learning approach to network intrusion detection,'' \textit{IEEE Trans. Emerg. Topics Comput. Intell.}, vol.~2, no.~1, pp.~41--50, 2018.
 
-\bibitem[Shoshitaishvili et~al.(2016)]{shoshitaishvili2016}
-Shoshitaishvili, Y., Wang, R., Salls, C., Stephens, N., Polino, M., Dutcher, A., Grosen, J., Feng, S., Hauser, C., Kruegel, C., and Vigna, G. (2016).
-SOK: (State of) the art of war: Offensive techniques in binary analysis.
-\textit{IEEE Symposium on Security and Privacy (SP)}, pp.\ 138--157.
+\bibitem{shoshitaishvili2016}
+Y. Shoshitaishvili, R. Wang, C. Salls, N. Stephens, M. Polino, A. Dutcher, J. Grosen, S. Feng, C. Hauser, C. Kruegel, and G. Vigna, ``SOK: (State of) the art of war: Offensive techniques in binary analysis,'' in \textit{Proc. IEEE Symp. Security Privacy (SP)}, 2016, pp.~138--157.
 
-\bibitem[Slack et~al.(2020)]{slack2020}
-Slack, D., Hilgard, S., Jia, E., Singh, S., and Lakkaraju, H. (2020).
-Fooling LIME and SHAP: Adversarial attacks on post hoc explanation methods.
-\textit{AAAI/ACM Conference on AI, Ethics, and Society}, pp.\ 180--186.
+\bibitem{slack2020}
+D. Slack, S. Hilgard, E. Jia, S. Singh, and H. Lakkaraju, ``Fooling LIME and SHAP: Adversarial attacks on post hoc explanation methods,'' in \textit{Proc. AAAI/ACM Conf. AI, Ethics, Society}, 2020, pp.~180--186.
 
-\bibitem[Wang et~al.(2017)]{wang2017}
-Wang, W., Zhu, M., Zeng, X., Ye, X., and Sheng, Y. (2017).
-Malware traffic classification using convolutional neural network for representation learning.
-\textit{International Conference on Information Networking (ICOIN)}, pp.\ 712--717.
+\bibitem{wang2017}
+W. Wang, M. Zhu, X. Zeng, X. Ye, and Y. Sheng, ``Malware traffic classification using convolutional neural network for representation learning,'' in \textit{Proc. Int. Conf. Inf. Netw. (ICOIN)}, 2017, pp.~712--717.
 
-\bibitem[Lin et~al.(2022)]{lin2022}
-Lin, Z., Shi, Y., and Xue, Z. (2022).
-IDSGAN: Generative adversarial networks for attack generation against intrusion detection.
-\textit{Advances in Knowledge Discovery and Data Mining (PAKDD)}, LNCS vol.\ 13282, pp.\ 79--91. Springer.
+\bibitem{lin2022}
+Z. Lin, Y. Shi, and Z. Xue, ``IDSGAN: Generative adversarial networks for attack generation against intrusion detection,'' in \textit{Advances Knowl. Discovery Data Mining (PAKDD)}, LNCS, vol.~13282, Springer, 2022, pp.~79--91.
 
-\bibitem[Pang et~al.(2021)]{pang2021}
-Pang, G., Shen, C., Cao, L., and van den Hengel, A. (2021).
-Deep learning for anomaly detection: A review.
-\textit{ACM Computing Surveys}, 54(2):Article 38.
+\bibitem{pang2021}
+G. Pang, C. Shen, L. Cao, and A. van~den~Hengel, ``Deep learning for anomaly detection: A review,'' \textit{ACM Comput. Surveys}, vol.~54, no.~2, Art.~38, 2021.
 
-\bibitem[Roesch(1999)]{roesch1999}
-Roesch, M. (1999).
-Snort: Lightweight intrusion detection for networks.
-\textit{Proceedings of LISA '99: 13th Systems Administration Conference}, pp.\ 229--238.
+\bibitem{roesch1999}
+M. Roesch, ``Snort: Lightweight intrusion detection for networks,'' in \textit{Proc. LISA}, 1999, pp.~229--238.
 
-\bibitem[Ahmad et~al.(2021)]{ahmad2021}
-Ahmad, Z., Shahid~Khan, A., Wai~Shiang, C., Abdullah, J., and Ahmad, F. (2021).
-Network intrusion detection system: A systematic study of machine learning and deep learning approaches.
-\textit{Transactions on Emerging Telecommunications Technologies}, 32(1):e4150.
+\bibitem{ahmad2021}
+Z. Ahmad, A. Shahid~Khan, C. Wai~Shiang, J. Abdullah, and F. Ahmad, ``Network intrusion detection system: A systematic study of machine learning and deep learning approaches,'' \textit{Trans. Emerg. Telecommun. Technol.}, vol.~32, no.~1, p.~e4150, 2021.
 
-\bibitem[Wang et~al.(2022)]{wang2022saferl}
-Wang, J., Chen, Y., and Li, X. (2022).
-SafeRL-IDS: Safe reinforcement learning for network intrusion detection.
-\textit{Proceedings of the ACM Conference on Computer and Communications Security (CCS)}, pp.\ 1789--1802.
+\bibitem{wang2022saferl}
+J. Wang, Y. Chen, and X. Li, ``SafeRL-IDS: Safe reinforcement learning for network intrusion detection,'' in \textit{Proc. ACM Conf. Comput. Commun. Security (CCS)}, 2022, pp.~1789--1802.
 
-\bibitem[Kumar et~al.(2023)]{kumar2023shield}
-Kumar, R., Singh, A., and Patel, D. (2023).
-Shield-RL: Shielded reinforcement learning for network security.
-\textit{Proceedings of the Network and Distributed System Security Symposium (NDSS)}, pp.\ 1--15.
+\bibitem{kumar2023shield}
+R. Kumar, A. Singh, and D. Patel, ``Shield-RL: Shielded reinforcement learning for network security,'' in \textit{Proc. Netw. Distrib. Syst. Security Symp. (NDSS)}, 2023, pp.~1--15.
 
-\bibitem[Zhang et~al.(2021)]{zhang2021deepsymnet}
-Zhang, K., Wang, L., and Liu, H. (2021).
-DeepSymNet: Deep symbolic network for neural-symbolic integration in network security.
-\textit{Proceedings of the AAAI Conference on Artificial Intelligence}, pp.\ 8934--8941.
+\bibitem{zhang2021deepsymnet}
+K. Zhang, L. Wang, and H. Liu, ``DeepSymNet: Deep symbolic network for neural-symbolic integration in network security,'' in \textit{Proc. AAAI Conf. Artif. Intell.}, 2021, pp.~8934--8941.
 
-\bibitem[Li et~al.(2021)]{li2021logicids}
-Li, M., Zhao, R., and Chen, W. (2021).
-LogicIDS: Interpretable intrusion detection with logical reasoning.
-\textit{IEEE Transactions on Network Science and Engineering}, 8(3):2145--2157.
+\bibitem{li2021logicids}
+M. Li, R. Zhao, and W. Chen, ``LogicIDS: Interpretable intrusion detection with logical reasoning,'' \textit{IEEE Trans. Netw. Sci. Eng.}, vol.~8, no.~3, pp.~2145--2157, 2021.
 
-\bibitem[Otoum et~al.(2019)]{otoum2019}
-Otoum, S., Kantarci, B., and Mouftah, H.T. (2019).
-On the feasibility of deep learning in sensor network intrusion detection.
-\textit{IEEE Networking Letters}, 1(2):68--71.
+\bibitem{otoum2019}
+S. Otoum, B. Kantarci, and H.~T. Mouftah, ``On the feasibility of deep learning in sensor network intrusion detection,'' \textit{IEEE Netw. Lett.}, vol.~1, no.~2, pp.~68--71, 2019.
 
-\bibitem[Sharafaldin et~al.(2018)]{sharafaldin2018}
-Sharafaldin, I., Lashkari, A.H., and Ghorbani, A.A. (2018).
-Toward generating a new intrusion detection dataset and intrusion traffic characterization.
-\textit{International Conference on Information Systems Security and Privacy (ICISSP)}, pp.\ 108--116.
+\bibitem{sharafaldin2018}
+I. Sharafaldin, A.~H. Lashkari, and A.~A. Ghorbani, ``Toward generating a new intrusion detection dataset and intrusion traffic characterization,'' in \textit{Proc. Int. Conf. Inf. Syst. Security Privacy (ICISSP)}, 2018, pp.~108--116.
 
-\bibitem[Zhang and Zulkernine(2006)]{zhang2008random}
-Zhang, J. and Zulkernine, M. (2006).
-A hybrid network intrusion detection technique using random forests.
-\textit{First International Conference on Availability, Reliability and Security (ARES'06)}, pp.\ 262--269. IEEE.
+\bibitem{zhang2008random}
+J. Zhang and M. Zulkernine, ``A hybrid network intrusion detection technique using random forests,'' in \textit{Proc. 1st Int. Conf. Availability, Rel. Security (ARES)}, IEEE, 2006, pp.~262--269.
 
-\bibitem[Xin et~al.(2018)]{xin2018}
-Xin, Y., Kong, L., Liu, Z., Chen, Y., Li, Y., Zhu, H., Gao, M., Hou, H., and Wang, C. (2018).
-Machine learning and deep learning methods for cybersecurity.
-\textit{IEEE Access}, 6:35365--35381.
+\bibitem{xin2018}
+Y. Xin, L. Kong, Z. Liu, Y. Chen, Y. Li, H. Zhu, M. Gao, H. Hou, and C. Wang, ``Machine learning and deep learning methods for cybersecurity,'' \textit{IEEE Access}, vol.~6, pp.~35365--35381, 2018.
 
-\bibitem[Amor et~al.(2004)]{amor2004naive}
-Amor, N.B., Benferhat, S., and Elouedi, Z. (2004).
-Naive Bayes vs decision trees in intrusion detection systems.
-\textit{Proceedings of the 2004 ACM Symposium on Applied Computing}, pp.\ 420--424.
+\bibitem{amor2004naive}
+N.~B. Amor, S. Benferhat, and Z. Elouedi, ``Naive Bayes vs decision trees in intrusion detection systems,'' in \textit{Proc. ACM Symp. Appl. Comput.}, 2004, pp.~420--424.
 
-\bibitem[Mukkamala et~al.(2002)]{mukkamala2002intrusion}
-Mukkamala, S., Janoski, G., and Sung, A. (2002).
-Intrusion detection using neural networks and support vector machines.
-\textit{Proceedings of the International Joint Conference on Neural Networks (IJCNN)}, vol.\ 2, pp.\ 1702--1707.
+\bibitem{mukkamala2002intrusion}
+S. Mukkamala, G. Janoski, and A. Sung, ``Intrusion detection using neural networks and support vector machines,'' in \textit{Proc. Int. Joint Conf. Neural Netw. (IJCNN)}, vol.~2, 2002, pp.~1702--1707.
 
-\bibitem[Tavallaee et~al.(2009)]{tavallaee2009}
-Tavallaee, M., Bagheri, E., Lu, W., and Ghorbani, A.A. (2009).
-A detailed analysis of the KDD CUP 99 data set.
-\textit{IEEE Symposium on Computational Intelligence for Security and Defense Applications (CISDA)}, pp.\ 1--6.
+\bibitem{tavallaee2009}
+M. Tavallaee, E. Bagheri, W. Lu, and A.~A. Ghorbani, ``A detailed analysis of the KDD CUP 99 data set,'' in \textit{Proc. IEEE Symp. Comput. Intell. Security Defense Appl. (CISDA)}, 2009, pp.~1--6.
 
 \end{thebibliography}
 
